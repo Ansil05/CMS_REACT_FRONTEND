@@ -1,0 +1,11 @@
+import React from 'react';
+import Card from './Card';
+
+export default function StatCard({ title, value }) {
+  return (
+    <Card className="stat-card">
+      <div className="stat-title">{title}</div>
+      <div className="stat-value">{value}</div>
+    </Card>
+  );
+}
