@@ -1,19 +1,18 @@
-import React from 'react';
-import './App.css';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { RoleProvider } from './context/RoleContext';
-import AppRoutes from './routes/index.jsx';
+import AppRoutes from './routes';
+import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <RoleProvider>
-        <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <RoleProvider>
           <AppRoutes />
-        </BrowserRouter>
-      </RoleProvider>
-    </AuthProvider>
+        </RoleProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

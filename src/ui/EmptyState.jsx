@@ -12,26 +12,27 @@ const EmptyState = ({
       style={{ 
         background: 'white',
         borderRadius: 'var(--radius-lg)',
-        padding: '3rem 2rem'
+        padding: '4rem 2rem'
       }}
     >
       <div 
-        className="mb-4 d-inline-flex align-items-center justify-content-center"
+        className="mx-auto mb-4 d-flex align-items-center justify-content-center"
         style={{
           width: '80px',
           height: '80px',
-          borderRadius: 'var(--radius-xl)',
-          background: 'var(--bg-tertiary)'
+          borderRadius: '50%',
+          background: 'var(--bg-tertiary)',
+          color: 'var(--text-muted)'
         }}
       >
-        <Icon size={40} style={{ color: 'var(--text-muted)' }} />
+        <Icon size={36} />
       </div>
       
-      <h4 className="mb-2" style={{ color: 'var(--text-primary)' }}>
+      <h4 className="fw-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
         {title}
       </h4>
       
-      <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>
+      <p className="text-muted mb-4" style={{ maxWidth: '400px', margin: '0 auto' }}>
         {description}
       </p>
       

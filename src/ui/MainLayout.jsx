@@ -1,29 +1,46 @@
 import { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 import { useRole } from '../context/RoleContext';
 
 const MainLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { role } = useRole();
-  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Close sidebar on mobile when route changes
   useEffect(() => {
-    if (window.innerWidth < 992) {
-      setSidebarOpen(false);
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setIsDarkMode(true);
+      document.body.classList.add('dark-mode');
     }
-  }, [location]);
+  }, []);
 
-  // Handle responsive sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    if (newMode) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 992) {
-        setSidebarOpen(true);
-      } else {
+      if (window.innerWidth < 992) {
         setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
       }
     };
 
@@ -32,28 +49,42 @@ const MainLayout = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
   return (
-    <div className="d-flex flex-column min-vh-100" style={{ background: 'var(--bg-secondary)' }}>
-      <Navbar toggleSidebar={toggleSidebar} />
+    <div className="d-flex flex-column" style={{ minHeight: '100vh' }}>
+      <Navbar 
+        toggleSidebar={toggleSidebar} 
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
+      />
       
       <div className="d-flex flex-grow-1 position-relative">
-        <Sidebar isOpen={sidebarOpen} role={role} />
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          role={role}
+          isDarkMode={isDarkMode}
+        />
         
         <main 
-          className="flex-grow-1 p-4 fade-in"
-          style={{ 
+          className="flex-grow-1 d-flex flex-column"
+          style={{
             marginLeft: sidebarOpen && window.innerWidth >= 992 ? '280px' : '0',
-            transition: 'margin-left var(--transition-base)',
-            minHeight: 'calc(100vh - 68px - 70px)', // minus navbar and footer height
+            transition: 'margin-left 0.3s ease',
+            minHeight: 'calc(100vh - 80px)' // Updated from 68px to 80px
           }}
         >
-          <Outlet />
+          <div 
+            className="flex-grow-1"
+            style={{
+              padding: '2rem',
+              background: isDarkMode ? '#0f172a' : '#f8fafc'
+            }}
+          >
+            <Outlet />
+          </div>
+          
+          <Footer isDarkMode={isDarkMode} />
         </main>
       </div>
-      
-      <Footer />
     </div>
   );
 };
