@@ -41,7 +41,7 @@ const AppRoutes = () => {
       admin: '/admin',
       doctor: '/doctor',
       receptionist: '/receptionist',
-      'lab-technician': '/lab-technician',
+      labTechnician: '/lab-technician',
       pharmacist: '/pharmacist',
     };
     return routes[role] || '/login';
