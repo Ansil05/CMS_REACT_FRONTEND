@@ -1,11 +1,26 @@
-import React from 'react';
+import { Breadcrumb as BSBreadcrumb } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { FaHome } from 'react-icons/fa';
 
-export default function Breadcrumb({ items = [] }) {
+const Breadcrumb = ({ items }) => {
   return (
-    <nav className="breadcrumb">
-      {items.map((it, idx) => (
-        <span key={idx}>{it}</span>
+    <BSBreadcrumb className="mb-4">
+      <BSBreadcrumb.Item linkAs={Link} linkProps={{ to: '/' }}>
+        <FaHome size={14} />
+      </BSBreadcrumb.Item>
+      
+      {items.map((item, index) => (
+        <BSBreadcrumb.Item
+          key={index}
+          linkAs={item.path ? Link : 'span'}
+          linkProps={item.path ? { to: item.path } : {}}
+          active={index === items.length - 1}
+        >
+          {item.label}
+        </BSBreadcrumb.Item>
       ))}
-    </nav>
+    </BSBreadcrumb>
   );
-}
+};
+
+export default Breadcrumb;

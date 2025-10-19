@@ -593,3 +593,199 @@ textarea:focus {
     box-shadow: none !important;
   }
 }
+/* Sidebar Styles */
+.sidebar-link {
+  color: var(--text-secondary);
+}
+
+.sidebar-link:hover {
+  background: var(--bg-tertiary);
+  color: var(--primary-600);
+}
+
+.sidebar-link-active {
+  background: var(--gradient-primary);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.sidebar-link-active svg {
+  color: white !important;
+}
+
+/* Dropdown overrides */
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+.dropdown-menu {
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+}
+
+.dropdown-item {
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+}
+
+.dropdown-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 1rem;
+}
+
+/* Skeleton Loader Animation */
+.skeleton-loader {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 0%,
+    var(--bg-light) 50%,
+    var(--bg-tertiary) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Toast improvements */
+.toast-header {
+  font-weight: 600;
+}
+
+/* Pagination styling */
+.pagination .page-link {
+  border-radius: var(--radius-md);
+  margin: 0 0.25rem;
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary-300);
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--gradient-primary);
+  border-color: transparent;
+}
+
+.pagination .page-item.disabled .page-link {
+  opacity: 0.5;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Sidebar Dark Theme */
+.sidebar-link-dark {
+  color: #e2e8f0;
+}
+
+.sidebar-link-dark:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #667eea;
+}
+
+.sidebar-link-dark.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.sidebar-link-light.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Navbar Dark Theme */
+.navbar-dark .dropdown-menu {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.navbar-dark .dropdown-item {
+  color: #e2e8f0;
+}
+
+.navbar-dark .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Card Dark Theme */
+body.dark-mode .card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .card-header {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* Table Dark Theme */
+body.dark-mode .table {
+  color: #e2e8f0;
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Form Dark Theme */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+  background: #334155;
+  border-color: #667eea;
+  color: #e2e8f0;
+}
+
+body.dark-mode .form-label {
+  color: #e2e8f0;
+}
+
+/* Badge Dark Theme */
+body.dark-mode .badge {
+  filter: brightness(0.9);
+}
+
+/* Smooth Transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
