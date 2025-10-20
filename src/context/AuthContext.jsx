@@ -4,12 +4,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   // Remove useNavigate from here - it's outside Router!
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Always authenticated for testing
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Always authenticated for testing
   const [user, setUser] = useState({
     id: 1,
-    username: 'receptionist',
-    email: 'receptionist@clinic.com',
-    role: 'receptionist'
+    username: '',
+    email: '',
+    role: ''
   });
 
   // Mock login - always succeeds

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { Form, Button, Card, Container, Row, Col, Alert, Spinner } from "react-bootstrap";
 
 const Login = () => {
+  console.log("Rendering Login component");
   const { login } = useAuth();
   const { setRole } = useRole();
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ const Login = () => {
                 </Form.Group>
 
                 <div className="d-grid">
-                  <Button variant="primary" type="submit" disabled={loading}>
+                  <Button style={{background:"#2e7d32",color:"white",border:"none"}} type="submit" disabled={loading}>
                     {loading ? <Spinner size="sm" animation="border" /> : "Login"}
                   </Button>
                 </div>
