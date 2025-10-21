@@ -39,6 +39,7 @@ import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
+import PublicLandingPage from '../pages/PublicLandingPage';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -47,11 +48,11 @@ const AppRoutes = () => {
   // Get home route based on role
   const getHomeRoute = () => {
     const routes = {
-      admin: '/admin',
-      doctor: '/doctor',
-      receptionist: '/receptionist',
-      'lab-technician': '/lab-technician',
-      pharmacist: '/pharmacist',
+      admin: '/app/admin',
+      doctor: '/app/doctor',
+      receptionist: '/app/receptionist',
+      labTechnician: '/app/lab-technician',
+      pharmacist: '/app/pharmacist',
     };
     return routes[role] || '/login';
   };
@@ -65,10 +66,13 @@ const AppRoutes = () => {
           isAuthenticated ? <Navigate to={getHomeRoute()} replace /> : <Login />
         } 
       />
+      <Route path='/'
+      element={<PublicLandingPage />}/>
 
+      
       {/* Protected Routes */}
       <Route 
-        path="/" 
+        path="/app" 
         element={
           <ProtectedRoute>
             <MainLayout />
@@ -198,7 +202,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['lab-technician']}>
+              <RoleBasedRoute allowedRoles={['labTechnician']}>
                 <LabHome />
               </RoleBasedRoute>
             }
