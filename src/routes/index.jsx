@@ -198,7 +198,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['lab-technician']}>
+              <RoleBasedRoute allowedRoles={['labTechnician']}>
                 <LabHome />
               </RoleBasedRoute>
             }

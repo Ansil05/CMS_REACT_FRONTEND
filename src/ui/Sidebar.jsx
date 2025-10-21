@@ -34,7 +34,7 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
         { path: '/receptionist/appointments', icon: FaCalendar, label: 'Appointments' },
         { path: '/receptionist/billing', icon: FaFileInvoiceDollar, label: 'Billing' },
       ],
-      'lab-technician': [
+      labTechnician: [
         { path: '/lab-technician', icon: FaHome, label: 'Dashboard' },
         { path: '/lab-technician/tests', icon: FaFlask, label: 'Lab Tests' },
         { path: '/lab-technician/reports', icon: FaChartBar, label: 'Reports' },

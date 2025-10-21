@@ -1,57 +1,116 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { FaFlask, FaListAlt, FaClipboardCheck, FaVial } from "react-icons/fa";
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { 
+  FaUserPlus, FaUsers, FaCalendarPlus, FaFileInvoiceDollar 
+} from 'react-icons/fa';
+
+import LoadingSpinner from '../../ui/LoadingSpinner';
 
 const LabHome = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const summary = [
-    { title: "Pending Tests", value: 12 },
-    { title: "Completed Tests", value: 45 },
-    { title: "New Requests", value: 5 },
-  ];
-
-  const cards = [
-    { title: "Dashboard", icon: <FaFlask />, color: "blue", path: "/lab/dashboard" },
-    { title: "Lab Test List", icon: <FaListAlt />, color: "green", path: "/lab/tests" },
-    { title: "Test Requests", icon: <FaClipboardCheck />, color: "yellow", path: "/lab/requests" },
-    { title: "Lab Results", icon: <FaVial />, color: "purple", path: "/lab/results" },
+  const dashboardCards = [
+    {
+      title: 'Test Lists',
+      description: 'View differnt tests',
+      icon: FaUserPlus,
+      color: '#1e88e5',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      path: '/receptionist/patients/add',
+    },
+    {
+      title: 'Test Requests',
+      description: 'View, update, and manage patient lab tests',
+      icon: FaUsers,
+      color: '#26a69a',
+      gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+      path: '/receptionist/patients',
+    },
+    {
+      title: 'Test Results',
+      description: 'Expected outcome of the measurement',
+      icon: FaCalendarPlus,
+      color: '#42a5f5',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #42a5f5 100%)',
+      path: '/receptionist/appointments/add',
+    },
+    {
+      title: 'Test bill',
+      description: 'Generate and manage billing records',
+      icon: FaFileInvoiceDollar,
+      color: '#ab47bc',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      path: '/receptionist/billing/add',
+    },
   ];
 
   return (
-    <div className="p-6 space-y-8">
-      {/* Heading */}
-      <h2 className="text-2xl font-semibold mb-2">Welcome to Lab Technician Portal</h2>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {summary.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white p-6 rounded-xl shadow-md text-center hover:shadow-lg transition"
-          >
-            <h3 className="text-lg font-medium text-gray-600">{item.title}</h3>
-            <p className="text-3xl font-bold text-blue-700 mt-2">{item.value}</p>
-          </div>
-        ))}
+    <Container fluid>
+      {/* Header */}
+      <div className="text-center mb-5">
+        <h1 
+          className="fw-bold mb-3" 
+          style={{ 
+            fontSize: '2.5rem',
+            color: 'var(--primary-600)'
+          }}
+        >
+          LABORATORY DASHBOARD
+        </h1>
+        <p className="text-muted" style={{ fontSize: '1.125rem' }}>
+          Manage  and evaluvate lab tests...
+        </p>
       </div>
 
-      {/* Navigation Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {cards.map((c, i) => (
-          <div
-            key={i}
-            onClick={() => navigate(c.path)}
-            className={`cursor-pointer bg-white shadow-md rounded-xl p-6 border-t-4 border-${c.color}-500 hover:shadow-lg transition`}
-          >
-            <div className="flex flex-col items-center space-y-3">
-              <div className={`text-${c.color}-600 text-4xl`}>{c.icon}</div>
-              <h3 className="text-lg font-semibold">{c.title}</h3>
-            </div>
-          </div>
+      {/* Dashboard Cards */}
+      <Row className="g-4 justify-content-center stagger-animation">
+        {dashboardCards.map((card, index) => (
+          <Col xs={12} sm={6} lg={3} key={index}>
+            <Card 
+              className="border-0 shadow-sm card-hover h-100"
+              onClick={() => navigate(card.path)}
+              style={{ 
+                cursor: 'pointer', 
+                borderRadius: 'var(--radius-xl)',
+                background: 'white',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <Card.Body className="p-4 text-center">
+                {/* Icon */}
+                <div 
+                  className="mx-auto mb-4 d-flex align-items-center justify-content-center"
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: 'var(--radius-xl)',
+                    background: card.gradient,
+                    boxShadow: `0 8px 16px ${card.color}40`
+                  }}
+                >
+                  <card.icon size={36} color="white" />
+                </div>
+
+                {/* Title */}
+                <h5 className="fw-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  {card.title}
+                </h5>
+
+                {/* Description */}
+                <p 
+                  className="text-muted mb-0" 
+                  style={{ fontSize: '0.875rem', lineHeight: '1.5' }}
+                >
+                  {card.description}
+                </p>
+              </Card.Body>
+            </Card>
+          </Col>
         ))}
-      </div>
-    </div>
+      </Row>
+    </Container>
   );
 };
 
