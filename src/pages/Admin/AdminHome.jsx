@@ -18,7 +18,7 @@ const AdminHome = () => {
       icon: FaUserPlus,
       color: '#1e88e5',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      path: '#',
+      path: '/admin',
     },
     {
       title: 'View staffs',

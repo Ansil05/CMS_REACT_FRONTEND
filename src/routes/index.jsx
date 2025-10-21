@@ -70,9 +70,9 @@ const AppRoutes = () => {
       <Route 
         path="/" 
         element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <MainLayout />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         }
       >
         {/* Default redirect to role-specific home */}
@@ -198,7 +198,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['lab-technician']}>
+              <RoleBasedRoute allowedRoles={['labTechnician']}>
                 <LabHome />
               </RoleBasedRoute>
             }
