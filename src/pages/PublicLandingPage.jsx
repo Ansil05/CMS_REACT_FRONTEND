@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Card, Button, Navbar, Nav } from 'react-bootstrap';
 import { 
   FaHospital, 
   FaUserMd, 
@@ -17,10 +18,14 @@ import {
   FaMapMarkerAlt,
   FaClock,
   FaStar,
-  FaCheckCircle
+  FaCheckCircle,
+  FaSignInAlt,
+  FaCalendarAlt,
+  FaInfoCircle
 } from 'react-icons/fa';
 
 const PublicLandingPage = () => {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -30,6 +35,10 @@ const PublicLandingPage = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLoginClick = () => {
+    navigate('/login'); // Navigate to your login page
+  };
 
   const departments = [
     {
@@ -91,10 +100,10 @@ const PublicLandingPage = () => {
   ];
 
   const stats = [
-    { number: '20+', label: 'Years of Excellence' },
-    { number: '50+', label: 'Expert Doctors' },
-    { number: '100K+', label: 'Patients Treated' },
-    { number: '24/7', label: 'Emergency Care' }
+    { number: '20+', label: 'Years of Excellence', icon: FaAward },
+    { number: '50+', label: 'Expert Doctors', icon: FaUserMd },
+    { number: '100K+', label: 'Patients Treated', icon: FaHeartbeat },
+    { number: '24/7', label: 'Emergency Care', icon: FaClock }
   ];
 
   const achievements = [
@@ -107,118 +116,261 @@ const PublicLandingPage = () => {
   ];
 
   return (
-    <div style={{ 
-      background: 'linear-gradient(to bottom, #f8fafc, #e8f5e9)',
-      minHeight: '100vh',
-      fontFamily: 'Arial, sans-serif'
-    }}>
-      {/* Hero Section */}
-      <section style={{
-        background: 'linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)',
-        color: 'white',
-        padding: '100px 0 80px 0',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Decorative Background Pattern */}
+    <div style={{ minHeight: '100vh' }}>
+      {/* Fixed Professional Navbar */}
+      <Navbar 
+        fixed="top" 
+        expand="lg" 
+        style={{
+          background: scrolled 
+            ? 'rgba(255, 255, 255, 0.98)' 
+            : 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: scrolled 
+            ? '0 2px 20px rgba(0,0,0,0.1)' 
+            : '0 2px 10px rgba(0,0,0,0.05)',
+          padding: '10px 0',
+          transition: 'all 0.3s ease',
+          zIndex: 1000
+        }}
+      >
+        <Container>
+          <Navbar.Brand 
+            href="#home" 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px',
+              fontSize: '1.4rem',
+              fontWeight: 'bold',
+              color: '#2e7d32'
+            }}
+          >
+            <FaHospital size={32} />
+            <span>ANGEL CARE HOSPITAL</span>
+          </Navbar.Brand>
+          
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto align-items-center" style={{ gap: '15px' }}>
+              <Nav.Link 
+                href="#home" 
+                style={{ 
+                  color: '#1e293b', 
+                  fontWeight: '500',
+                  fontSize: '1rem'
+                }}
+              >
+                Home
+              </Nav.Link>
+              <Nav.Link 
+                href="#about" 
+                style={{ 
+                  color: '#1e293b', 
+                  fontWeight: '500',
+                  fontSize: '1rem'
+                }}
+              >
+                About
+              </Nav.Link>
+              <Nav.Link 
+                href="#departments" 
+                style={{ 
+                  color: '#1e293b', 
+                  fontWeight: '500',
+                  fontSize: '1rem'
+                }}
+              >
+                Departments
+              </Nav.Link>
+              <Nav.Link 
+                href="#contact" 
+                style={{ 
+                  color: '#1e293b', 
+                  fontWeight: '500',
+                  fontSize: '1rem'
+                }}
+              >
+                Contact
+              </Nav.Link>
+              
+              {/* Emergency Call Button */}
+              <Button 
+                variant="outline-success"
+                size="md"
+                style={{
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  borderWidth: '2px',
+                  padding: '8px 20px'
+                }}
+              >
+                <FaPhone style={{ marginRight: '8px' }} />
+                Emergency
+              </Button>
+
+              {/* LOGIN Button - PROMINENT */}
+              <Button 
+                variant="success"
+                size="lg"
+                onClick={handleLoginClick}
+                style={{
+                  borderRadius: '10px',
+                  fontWeight: '700',
+                  padding: '12px 40px',
+                  background: 'linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)',
+                  border: 'none',
+                  boxShadow: '0 4px 15px rgba(46, 125, 50, 0.3)',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(46, 125, 50, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(46, 125, 50, 0.3)';
+                }}
+              >
+                <FaSignInAlt style={{ marginRight: '10px' }} />
+                LOGIN
+              </Button>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      {/* Hero Section with Hospital Background Image */}
+      <section 
+        id="home"
+        style={{
+          marginTop: '76px', // Account for fixed navbar
+          position: 'relative',
+          minHeight: '90vh',
+          display: 'flex',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, rgba(46, 125, 50, 0.95) 0%, rgba(27, 94, 32, 0.9) 100%), url("https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&q=80")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          color: 'white',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Overlay Pattern */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          opacity: 0.1,
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M30 0L60 30L30 60L0 30Z" fill="white"/%3E%3C/svg%3E")',
-          backgroundSize: '60px 60px'
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+          opacity: 0.3
         }} />
 
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <Row className="align-items-center">
-            <Col lg={6} className="text-center text-lg-start mb-4 mb-lg-0">
+            <Col lg={7}>
               <div style={{
                 display: 'inline-block',
-                padding: '8px 20px',
+                padding: '10px 25px',
                 background: 'rgba(255,255,255,0.2)',
                 borderRadius: '50px',
-                marginBottom: '20px',
-                fontSize: '0.9rem',
-                fontWeight: '600'
+                marginBottom: '25px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                backdropFilter: 'blur(10px)'
               }}>
-                <FaAward style={{ marginRight: '8px' }} />
-                20 Years of Trusted Healthcare
+                <FaAward style={{ marginRight: '10px' }} />
+                20 Years of Trusted Healthcare Excellence
               </div>
               
               <h1 style={{
-                fontSize: '3rem',
-                fontWeight: 'bold',
-                marginBottom: '20px',
+                fontSize: '3.5rem',
+                fontWeight: '800',
+                marginBottom: '25px',
                 lineHeight: '1.2',
-                textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+                textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
+                letterSpacing: '1px'
               }}>
-                ANGEL CARE MULTI-SPECIALITY HOSPITAL
+                ANGEL CARE<br />
+                MULTI-SPECIALITY<br />
+                HOSPITAL
               </h1>
               
               <p style={{
-                fontSize: '1.3rem',
-                marginBottom: '30px',
+                fontSize: '1.4rem',
+                marginBottom: '35px',
                 opacity: 0.95,
-                lineHeight: '1.6'
+                lineHeight: '1.8',
+                maxWidth: '600px',
+                textShadow: '1px 1px 4px rgba(0,0,0,0.3)'
               }}>
-                Your Health, Our Priority. Healing with Compassion, Caring with Excellence.
+                Your Health, Our Priority. Experience world-class healthcare with compassionate care and cutting-edge medical technology.
               </p>
 
-              <div className="d-flex gap-3 justify-content-center justify-content-lg-start">
+              <div className="d-flex gap-3 flex-wrap">
                 <Button 
                   size="lg"
                   style={{
                     background: 'white',
                     color: '#2e7d32',
                     border: 'none',
-                    padding: '12px 35px',
-                    fontWeight: '600',
+                    padding: '15px 40px',
+                    fontWeight: '700',
                     borderRadius: '50px',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                    fontSize: '1.1rem'
                   }}
                 >
-                  <FaPhone style={{ marginRight: '8px' }} />
+                  <FaCalendarAlt style={{ marginRight: '10px' }} />
                   Book Appointment
                 </Button>
                 <Button 
                   size="lg"
                   variant="outline-light"
                   style={{
-                    padding: '12px 35px',
-                    fontWeight: '600',
+                    padding: '15px 40px',
+                    fontWeight: '700',
                     borderRadius: '50px',
-                    borderWidth: '2px'
+                    borderWidth: '2px',
+                    fontSize: '1.1rem'
                   }}
                 >
-                  Emergency: 24/7
+                  <FaInfoCircle style={{ marginRight: '10px' }} />
+                  Learn More
                 </Button>
               </div>
             </Col>
 
-            <Col lg={6}>
+            <Col lg={5} className="mt-4 mt-lg-0">
               <div style={{
-                background: 'rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '20px',
-                padding: '30px',
-                border: '2px solid rgba(255,255,255,0.2)'
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(15px)',
+                borderRadius: '25px',
+                padding: '40px',
+                border: '2px solid rgba(255,255,255,0.3)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
               }}>
                 <Row>
                   {stats.map((stat, index) => (
-                    <Col xs={6} key={index} className="text-center mb-3">
+                    <Col xs={6} key={index} className="text-center mb-4">
+                      <stat.icon size={40} style={{ marginBottom: '15px', opacity: 0.9 }} />
                       <div style={{
-                        fontSize: '2.5rem',
+                        fontSize: '3rem',
                         fontWeight: 'bold',
-                        marginBottom: '5px'
+                        marginBottom: '8px',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
                       }}>
                         {stat.number}
                       </div>
                       <div style={{
-                        fontSize: '0.95rem',
-                        opacity: 0.9
+                        fontSize: '1.05rem',
+                        opacity: 0.95,
+                        fontWeight: '500'
                       }}>
                         {stat.label}
                       </div>
@@ -232,30 +384,30 @@ const PublicLandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section style={{ padding: '80px 0', background: 'white' }}>
+      <section id="about" style={{ padding: '100px 0', background: 'white' }}>
         <Container>
           <div className="text-center mb-5">
             <h2 style={{
-              fontSize: '2.5rem',
+              fontSize: '3rem',
               fontWeight: 'bold',
               color: '#1b5e20',
-              marginBottom: '15px'
+              marginBottom: '20px'
             }}>
               About Angel Care Hospital
             </h2>
             <div style={{
-              width: '80px',
-              height: '4px',
+              width: '100px',
+              height: '5px',
               background: 'linear-gradient(to right, #2e7d32, #1b5e20)',
-              margin: '0 auto 30px auto',
-              borderRadius: '2px'
+              margin: '0 auto 35px auto',
+              borderRadius: '3px'
             }} />
             <p style={{
-              fontSize: '1.1rem',
+              fontSize: '1.2rem',
               color: '#64748b',
-              maxWidth: '800px',
+              maxWidth: '900px',
               margin: '0 auto',
-              lineHeight: '1.8'
+              lineHeight: '2'
             }}>
               For over 20 years, Angel Care Multi-Speciality Hospital has been at the forefront of healthcare excellence, 
               providing compassionate care and advanced medical treatments to thousands of patients. Our commitment 
@@ -267,25 +419,33 @@ const PublicLandingPage = () => {
             {achievements.map((achievement, index) => (
               <Col md={6} lg={4} key={index}>
                 <div style={{
-                  padding: '20px',
+                  padding: '25px',
                   background: 'linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%)',
-                  borderRadius: '15px',
+                  borderRadius: '20px',
                   border: '2px solid #c8e6c9',
                   height: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '15px',
-                  transition: 'transform 0.3s ease',
-                  cursor: 'default'
+                  gap: '18px',
+                  transition: 'all 0.3s ease',
+                  cursor: 'default',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-8px)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.05)';
+                }}
                 >
-                  <FaCheckCircle size={30} color="#2e7d32" />
+                  <FaCheckCircle size={35} color="#2e7d32" />
                   <span style={{
-                    fontSize: '1rem',
+                    fontSize: '1.05rem',
                     color: '#1b5e20',
-                    fontWeight: '500'
+                    fontWeight: '600',
+                    lineHeight: '1.5'
                   }}>
                     {achievement}
                   </span>
@@ -297,28 +457,28 @@ const PublicLandingPage = () => {
       </section>
 
       {/* Departments Section */}
-      <section style={{ padding: '80px 0', background: '#f8fafc' }}>
+      <section id="departments" style={{ padding: '100px 0', background: '#f8fafc' }}>
         <Container>
           <div className="text-center mb-5">
             <h2 style={{
-              fontSize: '2.5rem',
+              fontSize: '3rem',
               fontWeight: 'bold',
               color: '#1b5e20',
-              marginBottom: '15px'
+              marginBottom: '20px'
             }}>
-              Our Specialities
+              Our Medical Departments
             </h2>
             <div style={{
-              width: '80px',
-              height: '4px',
+              width: '100px',
+              height: '5px',
               background: 'linear-gradient(to right, #2e7d32, #1b5e20)',
-              margin: '0 auto 30px auto',
-              borderRadius: '2px'
+              margin: '0 auto 35px auto',
+              borderRadius: '3px'
             }} />
             <p style={{
-              fontSize: '1.1rem',
+              fontSize: '1.2rem',
               color: '#64748b',
-              maxWidth: '700px',
+              maxWidth: '800px',
               margin: '0 auto'
             }}>
               Comprehensive healthcare services across multiple specialities with experienced doctors
@@ -330,64 +490,65 @@ const PublicLandingPage = () => {
               <Col md={6} lg={3} key={index}>
                 <Card style={{
                   border: 'none',
-                  borderRadius: '20px',
+                  borderRadius: '25px',
                   overflow: 'hidden',
                   height: '100%',
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.4s ease',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.08)'
+                  boxShadow: '0 5px 20px rgba(0,0,0,0.08)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-10px)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.transform = 'translateY(-15px)';
+                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)';
+                  e.currentTarget.style.boxShadow = '0 5px 20px rgba(0,0,0,0.08)';
                 }}
                 >
                   <div style={{
-                    background: `linear-gradient(135deg, ${dept.color}15 0%, ${dept.color}05 100%)`,
-                    padding: '30px',
+                    background: `linear-gradient(135deg, ${dept.color}20 0%, ${dept.color}05 100%)`,
+                    padding: '35px',
                     textAlign: 'center'
                   }}>
                     <div style={{
-                      width: '80px',
-                      height: '80px',
+                      width: '90px',
+                      height: '90px',
                       borderRadius: '50%',
                       background: dept.color,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 20px auto',
-                      boxShadow: `0 4px 15px ${dept.color}40`
+                      margin: '0 auto 25px auto',
+                      boxShadow: `0 5px 20px ${dept.color}50`
                     }}>
-                      <dept.icon size={35} color="white" />
+                      <dept.icon size={40} color="white" />
                     </div>
                     <h4 style={{
-                      fontSize: '1.3rem',
+                      fontSize: '1.4rem',
                       fontWeight: 'bold',
                       color: '#1e293b',
-                      marginBottom: '10px'
+                      marginBottom: '12px'
                     }}>
                       {dept.name}
                     </h4>
                     <p style={{
-                      fontSize: '0.95rem',
+                      fontSize: '1rem',
                       color: '#64748b',
-                      marginBottom: '15px'
+                      marginBottom: '20px',
+                      lineHeight: '1.6'
                     }}>
                       {dept.description}
                     </p>
                     <div style={{
-                      padding: '10px',
+                      padding: '12px',
                       background: 'white',
-                      borderRadius: '10px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                      borderRadius: '12px',
+                      boxShadow: '0 3px 10px rgba(0,0,0,0.05)'
                     }}>
-                      <FaUserMd size={16} color={dept.color} style={{ marginRight: '8px' }} />
+                      <FaUserMd size={18} color={dept.color} style={{ marginRight: '10px' }} />
                       <span style={{
-                        fontSize: '0.9rem',
+                        fontSize: '0.95rem',
                         color: '#1e293b',
                         fontWeight: '600'
                       }}>
@@ -406,27 +567,28 @@ const PublicLandingPage = () => {
       <section style={{
         background: 'linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)',
         color: 'white',
-        padding: '80px 0',
+        padding: '100px 0',
         position: 'relative'
       }}>
         <Container>
           <Row className="justify-content-center">
-            <Col lg={8} className="text-center">
-              <FaStar size={50} style={{ marginBottom: '30px', opacity: 0.9 }} />
+            <Col lg={9} className="text-center">
+              <FaStar size={60} style={{ marginBottom: '35px', opacity: 0.9 }} />
               <h3 style={{
-                fontSize: '2rem',
+                fontSize: '2.3rem',
                 fontWeight: '600',
-                marginBottom: '30px',
-                lineHeight: '1.6',
-                fontStyle: 'italic'
+                marginBottom: '35px',
+                lineHeight: '1.7',
+                fontStyle: 'italic',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
               }}>
                 "Committed to Excellence in Healthcare. We don't just treat illnesses, 
                 we care for people with compassion, dedication, and state-of-the-art medical expertise."
               </h3>
               <div style={{
-                fontSize: '1.1rem',
-                opacity: 0.9,
-                fontWeight: '500'
+                fontSize: '1.2rem',
+                opacity: 0.95,
+                fontWeight: '600'
               }}>
                 — Angel Care Multi-Speciality Hospital Team
               </div>
@@ -436,41 +598,46 @@ const PublicLandingPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section style={{ padding: '80px 0', background: 'white' }}>
+      <section id="contact" style={{ padding: '100px 0', background: 'white' }}>
         <Container>
           <div className="text-center mb-5">
             <h2 style={{
-              fontSize: '2.5rem',
+              fontSize: '3rem',
               fontWeight: 'bold',
               color: '#1b5e20',
-              marginBottom: '15px'
+              marginBottom: '20px'
             }}>
               Get In Touch
             </h2>
             <div style={{
-              width: '80px',
-              height: '4px',
+              width: '100px',
+              height: '5px',
               background: 'linear-gradient(to right, #2e7d32, #1b5e20)',
               margin: '0 auto',
-              borderRadius: '2px'
+              borderRadius: '3px'
             }} />
           </div>
 
           <Row className="g-4">
             <Col md={4}>
               <div style={{
-                padding: '30px',
+                padding: '40px',
                 background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-                borderRadius: '15px',
+                borderRadius: '20px',
                 textAlign: 'center',
-                height: '100%'
-              }}>
-                <FaPhone size={40} color="#2e7d32" style={{ marginBottom: '15px' }} />
-                <h5 style={{ color: '#1b5e20', marginBottom: '10px' }}>Phone</h5>
-                <p style={{ color: '#2e7d32', fontWeight: '600', marginBottom: '5px' }}>
+                height: '100%',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FaPhone size={45} color="#2e7d32" style={{ marginBottom: '20px' }} />
+                <h5 style={{ color: '#1b5e20', marginBottom: '15px', fontSize: '1.3rem', fontWeight: 'bold' }}>Phone</h5>
+                <p style={{ color: '#2e7d32', fontWeight: '600', marginBottom: '8px', fontSize: '1.1rem' }}>
                   +91 1800-XXX-XXXX
                 </p>
-                <p style={{ color: '#2e7d32', fontSize: '0.9rem' }}>
+                <p style={{ color: '#2e7d32', fontSize: '1rem' }}>
                   24/7 Emergency: +91 1800-XXX-YYYY
                 </p>
               </div>
@@ -478,18 +645,23 @@ const PublicLandingPage = () => {
 
             <Col md={4}>
               <div style={{
-                padding: '30px',
+                padding: '40px',
                 background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-                borderRadius: '15px',
+                borderRadius: '20px',
                 textAlign: 'center',
-                height: '100%'
-              }}>
-                <FaEnvelope size={40} color="#2e7d32" style={{ marginBottom: '15px' }} />
-                <h5 style={{ color: '#1b5e20', marginBottom: '10px' }}>Email</h5>
-                <p style={{ color: '#2e7d32', fontWeight: '600', marginBottom: '5px' }}>
+                height: '100%',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FaEnvelope size={45} color="#2e7d32" style={{ marginBottom: '20px' }} />
+                <h5 style={{ color: '#1b5e20', marginBottom: '15px', fontSize: '1.3rem', fontWeight: 'bold' }}>Email</h5>
+                <p style={{ color: '#2e7d32', fontWeight: '600', marginBottom: '8px', fontSize: '1.1rem' }}>
                   info@angelcarehospital.com
                 </p>
-                <p style={{ color: '#2e7d32', fontSize: '0.9rem' }}>
+                <p style={{ color: '#2e7d32', fontSize: '1rem' }}>
                   appointments@angelcarehospital.com
                 </p>
               </div>
@@ -497,15 +669,20 @@ const PublicLandingPage = () => {
 
             <Col md={4}>
               <div style={{
-                padding: '30px',
+                padding: '40px',
                 background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)',
-                borderRadius: '15px',
+                borderRadius: '20px',
                 textAlign: 'center',
-                height: '100%'
-              }}>
-                <FaMapMarkerAlt size={40} color="#2e7d32" style={{ marginBottom: '15px' }} />
-                <h5 style={{ color: '#1b5e20', marginBottom: '10px' }}>Location</h5>
-                <p style={{ color: '#2e7d32', fontWeight: '600', fontSize: '0.95rem' }}>
+                height: '100%',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FaMapMarkerAlt size={45} color="#2e7d32" style={{ marginBottom: '20px' }} />
+                <h5 style={{ color: '#1b5e20', marginBottom: '15px', fontSize: '1.3rem', fontWeight: 'bold' }}>Location</h5>
+                <p style={{ color: '#2e7d32', fontWeight: '600', fontSize: '1.05rem', lineHeight: '1.6' }}>
                   123 Healthcare Avenue,<br />
                   Medical District, City - 560001
                 </p>
@@ -519,29 +696,28 @@ const PublicLandingPage = () => {
       <footer style={{
         background: 'linear-gradient(135deg, #1b5e20 0%, #0d3d0f 100%)',
         color: 'white',
-        padding: '40px 0 20px 0'
+        padding: '50px 0 25px 0'
       }}>
         <Container>
           <Row className="align-items-center">
             <Col md={6} className="text-center text-md-start mb-3 mb-md-0">
-              <h4 style={{ marginBottom: '10px', fontWeight: 'bold' }}>
-                <FaHospital style={{ marginRight: '10px' }} />
+              <h4 style={{ marginBottom: '15px', fontWeight: 'bold', fontSize: '1.5rem' }}>
+                <FaHospital style={{ marginRight: '12px' }} />
                 ANGEL CARE MULTI-SPECIALITY HOSPITAL
               </h4>
-              <p style={{ opacity: 0.9, marginBottom: '15px' }}>
+              <p style={{ opacity: 0.9, marginBottom: '15px', fontSize: '1.05rem' }}>
                 Excellence in Healthcare Since 2005
               </p>
-              <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+              <p style={{ fontSize: '0.95rem', opacity: 0.8 }}>
                 © 2025 Angel Care Hospital. All rights reserved.
-                made by <strong>THE BOYS</strong>
               </p>
             </Col>
             <Col md={6} className="text-center text-md-end">
-              <div style={{ marginBottom: '15px' }}>
+              <div style={{ marginBottom: '20px', fontSize: '1.05rem' }}>
                 <FaClock style={{ marginRight: '10px' }} />
                 <strong>24/7 Emergency Services Available</strong>
               </div>
-              <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+              <div style={{ fontSize: '0.95rem', opacity: 0.8 }}>
                 ISO 9001:2015 Certified | NABH Accredited
               </div>
             </Col>

@@ -61,7 +61,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
             {/* ✅ LOGO IMAGE - Replaces the icon */}
             <img 
               src={logo}
-              alt="Faith Hospital Logo"
+              alt="Angel Care Hospital Logo"
               style={{
                 height: '55px',
                 width: 'auto',
@@ -98,7 +98,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
                   : '0 2px 4px rgba(46, 125, 50, 0.2)'
               }}
             >
-              FATHIMA MULTI-SPECIALITY HOSPITAL
+              ANGEL CARE MULTI-SPECIALITY HOSPITAL
             </span>
           </div>
 
