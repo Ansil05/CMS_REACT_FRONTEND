@@ -34,7 +34,7 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
         { path: '/receptionist/appointments', icon: FaCalendar, label: 'Appointments' },
         { path: '/receptionist/billing', icon: FaFileInvoiceDollar, label: 'Billing' },
       ],
-      'lab-technician': [
+      labTechnician: [
         { path: '/lab-technician', icon: FaHome, label: 'Dashboard' },
         { path: '/lab-technician/tests', icon: FaFlask, label: 'Lab Tests' },
         { path: '/lab-technician/reports', icon: FaChartBar, label: 'Reports' },
@@ -61,21 +61,21 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
           style={{ 
             background: 'rgba(0, 0, 0, 0.5)',
             zIndex: 1040,
-            top: '68px'
+            top: '80px' // ✅ CHANGED: Start below navbar
           }}
           onClick={() => {}}
         />
       )}
 
-      {/* Sidebar - Full Height */}
+      {/* Sidebar - Reduced Width & Starts Below Navbar */}
       <aside
         className={`sidebar-${isDarkMode ? 'dark' : 'light'}`}
         style={{
           position: 'fixed',
-          top: '68px',
-          left: isOpen ? '0' : '-280px',
-          width: '280px',
-          height: 'calc(100vh - 68px)',
+          top: '80px', // ✅ CHANGED: Start below navbar (80px navbar height)
+          left: isOpen ? '0' : '-250px', // ✅ CHANGED: Reduced from 280px to 250px
+          width: '250px', // ✅ CHANGED: Reduced from 280px to 250px
+          height: 'calc(100vh - 80px)', // ✅ CHANGED: Adjust height to account for navbar
           background: isDarkMode ? '#1e293b' : 'white',
           transition: 'all 0.3s ease',
           zIndex: 1050,
@@ -116,13 +116,13 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
 
         {/* Hospital Quote Section - Pushed to bottom */}
         <div 
-          className="mt-auto p-4"
+          className="mt-auto p-3" // ✅ CHANGED: Reduced padding from p-4 to p-3
           style={{
             background: isDarkMode 
               ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
               : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             borderRadius: '15px',
-            margin: '1rem',
+            margin: '0.75rem', // ✅ CHANGED: Reduced margin
             position: 'relative',
             overflow: 'hidden'
           }}
@@ -144,7 +144,7 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
           {/* Quote Icon */}
           <div 
             style={{
-              fontSize: '2rem',
+              fontSize: '1.8rem', // ✅ CHANGED: Slightly smaller
               color: 'rgba(255, 255, 255, 0.3)',
               marginBottom: '0.5rem'
             }}
@@ -156,9 +156,9 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
           <p 
             style={{
               color: 'white',
-              fontSize: '0.95rem',
-              lineHeight: '1.6',
-              marginBottom: '1rem',
+              fontSize: '0.85rem', // ✅ CHANGED: Slightly smaller
+              lineHeight: '1.5', // ✅ CHANGED: Tighter line height
+              marginBottom: '0.8rem',
               fontStyle: 'italic',
               position: 'relative',
               zIndex: 1
@@ -171,21 +171,19 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
           <div 
             style={{
               color: 'rgba(255, 255, 255, 0.9)',
-              fontSize: '0.75rem',
+              fontSize: '0.7rem', // ✅ CHANGED: Slightly smaller
               fontWeight: '600',
               borderTop: '1px solid rgba(255, 255, 255, 0.3)',
-              paddingTop: '0.75rem'
+              paddingTop: '0.75rem',
+              letterSpacing: '0.5px' // ✅ ADDED: Better readability
             }}
           >
-            Faith Multi-Speciality Hospital
+            ANGEL CARE MULTI-SPECIALITY HOSPITAL
           </div>
         </div>
       </aside>
     </>
   );
 };
-
-
-
 
 export default Sidebar;
