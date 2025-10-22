@@ -17,6 +17,9 @@ import AdminHome from '../pages/Admin/AdminHome';
 
 // Doctor Pages
 import DoctorHome from '../pages/Doctor/DoctorHome';
+import ViewAppointments from '../pages/Doctor/ViewAppointments';
+import ConsultPatient from '../pages/Doctor/ConsultPatient';
+import ConsultationHistory from '../pages/Doctor/ConsultationHistory';
 
 // Receptionist Pages
 import ReceptionistHome from '../pages/Receptionist/ReceptionistHome';
@@ -40,6 +43,7 @@ import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import PublicLandingPage from '../pages/PublicLandingPage';
+import TestList from '../pages/LabTechnician/TestList';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -103,6 +107,31 @@ const AppRoutes = () => {
                 <DoctorHome />
               </RoleBasedRoute>
             }
+          />
+          {/* ✅ ADD THESE 3 ROUTES */}
+          <Route 
+            path="appointments" 
+            element={
+              <RoleBasedRoute allowedRoles={['doctor']}>
+                <ViewAppointments />
+              </RoleBasedRoute>
+            } 
+          />
+          <Route 
+            path="consult/:appointmentId" 
+            element={
+              <RoleBasedRoute allowedRoles={['doctor']}>
+                <ConsultPatient />
+              </RoleBasedRoute>
+            } 
+          />
+          <Route 
+            path="consultations" 
+            element={
+              <RoleBasedRoute allowedRoles={['doctor']}>
+                <ConsultationHistory />
+              </RoleBasedRoute>
+            } 
           />
         </Route>
 
@@ -207,6 +236,14 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             }
           />
+          <Route
+            path='testlist'
+            element={
+              <RoleBasedRoute allowedRoles={['labTechnician']}>
+                <TestList/>
+              </RoleBasedRoute>
+            }
+          />
         </Route>
 
         {/* Pharmacist Routes */}
@@ -219,6 +256,7 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             }
           />
+          
         </Route>
       </Route>
 

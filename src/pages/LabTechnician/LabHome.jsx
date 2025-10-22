@@ -18,7 +18,7 @@ const LabHome = () => {
       icon: FaUserPlus,
       color: '#1e88e5',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      path: '/receptionist/patients/add',
+      path: '/app/lab-technician/testlist',
     },
     {
       title: 'Test Requests',
@@ -26,7 +26,7 @@ const LabHome = () => {
       icon: FaUsers,
       color: '#26a69a',
       gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-      path: '/receptionist/patients',
+      path: '',
     },
     {
       title: 'Test Results',

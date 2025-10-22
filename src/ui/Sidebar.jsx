@@ -1,16 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import { 
-  FaHome, 
-  FaUsers, 
-  FaCalendar, 
-  FaFileInvoiceDollar,
-  FaUserMd,
-  FaFlask,
-  FaPills,
-  FaCog,
-  FaChartBar,
-  FaQuoteLeft
-} from 'react-icons/fa';
+import { FaHome, FaUsers, FaCalendar, FaFileInvoiceDollar, FaUserMd, FaFlask, FaPills, FaCog, FaChartBar, FaQuoteLeft, FaFileAlt } from 'react-icons/fa';
+
 
 const Sidebar = ({ isOpen, role, isDarkMode }) => {
   const getMenuItems = () => {
@@ -23,11 +13,12 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
         { path: '/admin/settings', icon: FaCog, label: 'Settings' },
       ],
       doctor: [
-        { path: '/doctor', icon: FaHome, label: 'Dashboard' },
-        { path: '/doctor/appointments', icon: FaCalendar, label: 'Appointments' },
-        { path: '/doctor/patients', icon: FaUsers, label: 'Patients' },
-        { path: '/doctor/prescriptions', icon: FaPills, label: 'Prescriptions' },
-      ],
+  { path: '/app/doctor', icon: FaHome, label: 'Dashboard' },
+  { path: '/app/doctor/appointments', icon: FaCalendar, label: 'Appointments' },
+  { path: '/app/doctor/consultations', icon: FaFileAlt, label: 'Consultation History' },
+],
+
+
       receptionist: [
         { path: '/receptionist', icon: FaHome, label: 'Dashboard' },
         { path: '/receptionist/patients', icon: FaUsers, label: 'Patients' },

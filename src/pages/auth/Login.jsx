@@ -19,7 +19,8 @@ const Login = () => {
   };
 
   const handleLogin = (e) => {
-    e.preventDefault(); // prevent reload
+    e.preventDefault();
+    
     if (!formData.username || !formData.password || !formData.role) {
       setError("All fields are required");
       return;
@@ -30,19 +31,19 @@ const Login = () => {
 
     // Simulate login delay
     setTimeout(() => {
-      login(); // set isAuthenticated = true
-      setRole(formData.role); // store selected role
+      login(formData); // Pass the whole formData
+      setRole(formData.role);
 
       // Navigate to role-based page
       const routes = {
-        admin: "/admin",
-        doctor: "/doctor",
-        receptionist: "/receptionist",
-        labTechnician: "/lab-technician",
-        pharmacist: "/pharmacist",
+        admin: "/app/admin",
+        doctor: "/app/doctor",
+        receptionist: "/app/receptionist",
+        labTechnician: "/app/lab-technician",
+        pharmacist: "/app/pharmacist",
       };
 
-      navigate(routes[formData.role] || "/");
+      navigate(routes[formData.role] || "/app/receptionist");
       setLoading(false);
     }, 800);
   };
@@ -100,7 +101,11 @@ const Login = () => {
                 </Form.Group>
 
                 <div className="d-grid">
-                  <Button style={{background:"#2e7d32",color:"white",border:"none"}} type="submit" disabled={loading}>
+                  <Button 
+                    style={{background:"#2e7d32",color:"white",border:"none"}} 
+                    type="submit" 
+                    disabled={loading}
+                  >
                     {loading ? <Spinner size="sm" animation="border" /> : "Login"}
                   </Button>
                 </div>
@@ -108,7 +113,7 @@ const Login = () => {
 
               <div className="text-center mt-3">
                 <small>
-                  Don’t have an account? <a href="/signup">Sign up</a>
+                  Don't have an account? <a href="/signup">Sign up</a>
                 </small>
               </div>
             </Card.Body>

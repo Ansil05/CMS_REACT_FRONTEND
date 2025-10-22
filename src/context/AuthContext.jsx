@@ -3,8 +3,7 @@ import { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Remove useNavigate from here - it's outside Router!
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Always authenticated for testing
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({
     id: 1,
     username: '',
@@ -17,18 +16,17 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
     setUser({
       id: 1,
-      username: credentials.username || 'receptionist',
-      email: credentials.email || 'receptionist@clinic.com',
-      role: 'receptionist'
+      username: credentials.username || 'user',
+      email: credentials.email || 'user@clinic.com',
+      role: credentials.role || 'receptionist'
     });
-    return true;
+    return { success: true, role: credentials.role || 'receptionist' };
   };
 
-  // Mock logout - just clear state, navigate will be done in component
+  // Mock logout
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
-    // Don't navigate here - let the component handle it
   };
 
   return (
