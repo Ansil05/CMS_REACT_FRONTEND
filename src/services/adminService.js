@@ -1,6 +1,12 @@
 import { API_BASE } from '../config/apiConfig';
+import { handleApiError } from './api';
 
-export async function fetchUsers() {
-  const res = await fetch(`${API_BASE}/admin/users`);
-  return res.json();
-}
+export const fetchStaffs = async () => {
+  try {
+    const response = await api.get("api/admin/staffs/"); // ✅ DRF endpoint
+    return response.data;
+  } catch (err) {
+    handleApiError(err, { fallbackMessage: 'Failed to fetch staff data.' });
+  }
+
+};

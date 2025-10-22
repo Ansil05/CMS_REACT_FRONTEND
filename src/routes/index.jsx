@@ -44,6 +44,7 @@ import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import PublicLandingPage from '../pages/PublicLandingPage';
 import TestList from '../pages/LabTechnician/TestList';
+import StaffListPage from '../pages/Admin/StaffListPage';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -55,7 +56,7 @@ const AppRoutes = () => {
       admin: '/app/admin',
       doctor: '/app/doctor',
       receptionist: '/app/receptionist',
-      labTechnician: '/app/lab-technician',
+      labtechnician: '/app/lab-technician',
       pharmacist: '/app/pharmacist',
     };
     return routes[role] || '/login';
@@ -93,6 +94,14 @@ const AppRoutes = () => {
             element={
               <RoleBasedRoute allowedRoles={['admin']}>
                 <AdminHome />
+              </RoleBasedRoute>
+            }
+          />
+          <Route 
+            path="staffs"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <StaffListPage />
               </RoleBasedRoute>
             }
           />
@@ -231,7 +240,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['labTechnician']}>
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
                 <LabHome />
               </RoleBasedRoute>
             }
@@ -239,7 +248,7 @@ const AppRoutes = () => {
           <Route
             path='testlist'
             element={
-              <RoleBasedRoute allowedRoles={['labTechnician']}>
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
                 <TestList/>
               </RoleBasedRoute>
             }

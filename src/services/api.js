@@ -78,3 +78,31 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+
+export function handleApiError(err, { fallbackMessage = 'Something went wrong. Please try again.' } = {}) {
+  // Axios error with response (server responded with 4xx/5xx)
+  if (err && err.response) {
+    const status = err.response.status;
+    const data = err.response.data;
+    let message = fallbackMessage;
+    if (status === 401) message = 'Unauthorized. Please login again.';
+    else if (status === 400) message = 'Bad request. Please check the request data.';
+    else if (status === 404) message = 'Resource not found.';
+
+    const error = new Error(message);
+    error.status = status;
+    error.data = data;
+    throw error;
+  }
+
+  // Network errors or other unexpected failures
+  if (err && err.message) {
+    const error = new Error('Network error. Please check your connection and ensure the backend is running.');
+    error.original = err;
+    throw error;
+  }
+
+  // Fallback
+  throw new Error('Unknown error occurred while calling the API.');
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LoginForm from "./LoginForm";
 import api from "../../services/api";
 import { useAuth } from '../../context/AuthContext';
+import { useRole } from '../../context/RoleContext';
 
 
 
@@ -12,6 +13,7 @@ const LoginContainer = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setRole } = useRole();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +38,7 @@ const LoginContainer = () => {
       console.log(localStorage);
 
       login();
+      setRole(role);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         setError("Invalid username or password");
