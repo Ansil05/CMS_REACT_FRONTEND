@@ -15,12 +15,12 @@ export const AuthProvider = ({ children }) => {
   // Mock login - always succeeds
   const login = async (credentials) => {
     setIsAuthenticated(true);
-    setUser({
-      id: 1,
-      username: credentials.username || 'receptionist',
-      email: credentials.email || 'receptionist@clinic.com',
-      role: 'receptionist'
-    });
+    // setUser({
+    //   id: 1,
+    //   username: credentials.username || 'receptionist',
+    //   email: credentials.email || 'receptionist@clinic.com',
+    //   role: 'receptionist'
+    // });
     return true;
   };
 
