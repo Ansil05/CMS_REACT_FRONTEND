@@ -23,7 +23,7 @@ const StaffTable = ({ staffs }) => {
             <td>{staff.FirstName} {staff.LastName}</td>
             <td>{staff.DOB}</td>
             <td>{staff.Gender}</td>
-            <td>{staff.Role?.RoleName || "N/A"}</td>
+            <td>{staff.Role?.name || "N/A"}</td>
             <td>{staff.Email}</td>
             <td>{staff.PhoneNumber}</td>
             <td>{staff.IsActive ? "✅" : "❌"}</td>

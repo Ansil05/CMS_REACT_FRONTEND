@@ -1,5 +1,6 @@
 import { API_BASE } from '../config/apiConfig';
 import { handleApiError } from './api';
+import api from './api';
 
 export const fetchStaffs = async () => {
   try {
