@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../context/RoleContext';
+import MedicineList from '../pages/Pharmacist/MedicineList';
 
 // Layouts
 import MainLayout from '../ui/MainLayout';
