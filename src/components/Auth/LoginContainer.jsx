@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "./LoginForm";
 import api from "../../services/api";
-import { useAuth } from '../../context/AuthContext';
-import { useRole } from '../../context/RoleContext';
-
-
+import { useAuth } from "../../context/AuthContext";
+import { useRole } from "../../context/RoleContext";
 
 const LoginContainer = () => {
   const { login } = useAuth();
@@ -25,20 +23,38 @@ const LoginContainer = () => {
     setLoading(true);
 
     try {
+      // Make API call
       const response = await api.post("auth/login/", formData);
 
       const accessToken = response.data.tokens.access;
       const refreshToken = response.data.tokens.refresh;
-      const role = response.data.role;
 
+      // ✅ Normalize the role (case-insensitive fix)
+      const role = response.data.role
+        ? response.data.role.trim().toLowerCase()
+        : "";
+
+      // Save tokens + normalized role
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("role",role);
+      localStorage.setItem("role", role);
 
-      console.log(localStorage);
+      console.log("✅ Login Successful | Normalized Role:", role);
 
+      // Update global context
       login();
       setRole(role);
+
+      // ✅ Navigate to dashboard based on role
+      const routes = {
+        admin: "/app/admin",
+        doctor: "/app/doctor",
+        receptionist: "/app/receptionist",
+        labtechnician: "/app/lab-technician",
+        pharmacist: "/app/pharmacist",
+      };
+
+      navigate(routes[role] || "/app/receptionist");
     } catch (err) {
       if (err.response && err.response.status === 401) {
         setError("Invalid username or password");
