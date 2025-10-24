@@ -1,100 +1,98 @@
-import React, { useEffect, useState } from "react";
-import api from "../../services/api";
+import React, { useEffect, useState } from 'react';
+import api, { handleApiError } from '../services/api';
+import { FaFlask } from 'react-icons/fa';
 
 const TestList = () => {
   const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const response = await api.get("labtests/");
+        
+        const response = await api.get('/labtests/');
         setTests(response.data);
       } catch (err) {
-        setError("Failed to load lab tests. Please try again.");
+        console.error('Error fetching lab tests:', err);
+        try {
+          handleApiError(err);
+        } catch (handledError) {
+          setErrorMsg(handledError.message);
+        }
       } finally {
         setLoading(false);
       }
     };
+
     fetchTests();
   }, []);
 
-  return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="mb-6 text-center">
-        <h2 className="text-3xl font-bold text-blue-800">Lab Test List</h2>
-        <p className="text-gray-600 mt-2">
-          View all available lab tests with details
-        </p>
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen text-blue-600">
+        <FaFlask className="mr-2 animate-spin" /> Loading Lab Tests...
       </div>
+    );
 
-      {/* Loading */}
-      {loading && (
-        <div className="text-center text-gray-700 text-lg">Loading tests...</div>
-      )}
+  if (errorMsg)
+    return (
+      <div className="flex justify-center items-center h-screen text-red-600">
+        ⚠️ {errorMsg}
+      </div>
+    );
 
-      {/* Error */}
-      {error && (
-        <div className="text-center text-red-600 bg-red-50 border border-red-200 rounded-md py-3 px-4 mb-4">
-          {error}
-        </div>
-      )}
+  return (
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4 flex items-center text-blue-700">
+          <FaFlask className="mr-2" /> Lab Test List
+        </h2>
 
-      {/* Data Table */}
-      {!loading && !error && (
-        <div className="overflow-x-auto shadow-md rounded-xl bg-white">
-          <table className="min-w-full text-sm text-left text-gray-700 border border-gray-200">
-            <thead className="bg-blue-100 text-blue-900 uppercase text-xs font-semibold">
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-200 rounded-lg">
+            <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="px-6 py-3 border-b">#</th>
-                <th className="px-6 py-3 border-b">Test Name</th>
-                <th className="px-6 py-3 border-b">Description</th>
-                <th className="px-6 py-3 border-b">Sample Required</th>
-                <th className="px-6 py-3 border-b">Cost (₹)</th>
-                <th className="px-6 py-3 border-b">Created At</th>
+                <th className="p-3 text-left">Test ID</th>
+                <th className="p-3 text-left">Test Name</th>
+                <th className="p-3 text-left">Description</th>
+                <th className="p-3 text-left">Sample Required</th>
+                <th className="p-3 text-left">Cost (₹)</th>
+                <th className="p-3 text-left">Created Date</th>
               </tr>
             </thead>
             <tbody>
-              {tests.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="text-center py-6 text-gray-500 italic"
-                  >
-                    No tests available.
-                  </td>
-                </tr>
-              ) : (
-                tests.map((test, index) => (
+              {tests.length > 0 ? (
+                tests.map((test) => (
                   <tr
                     key={test.test_id}
-                    className="border-b hover:bg-gray-50 transition"
+                    className="border-b hover:bg-blue-50 transition"
                   >
-                    <td className="px-6 py-3">{index + 1}</td>
-                    <td className="px-6 py-3 font-medium text-gray-800">
+                    <td className="p-3">{test.test_id}</td>
+                    <td className="p-3 font-semibold text-gray-800">
                       {test.test_name}
                     </td>
-                    <td className="px-6 py-3 text-gray-600">
-                      {test.description || "—"}
+                    <td className="p-3 text-gray-600">{test.description}</td>
+                    <td className="p-3">{test.sample_required}</td>
+                    <td className="p-3 font-medium text-green-700">
+                      ₹{test.cost}
                     </td>
-                    <td className="px-6 py-3 text-gray-700">
-                      {test.sample_required || "—"}
-                    </td>
-                    <td className="px-6 py-3 text-gray-700">
-                      ₹{test.cost || 0}
-                    </td>
-                    <td className="px-6 py-3 text-gray-700">
-                      {new Date(test.created_at).toLocaleDateString("en-IN")}
+                    <td className="p-3 text-gray-500">
+                      {new Date(test.created_at).toLocaleDateString()}
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center p-4 text-gray-500">
+                    No lab tests found.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -7,7 +7,7 @@ const TestList = () => {
 
   useEffect(() => {
     // Replace with your actual API endpoint
-    fetch("http://localhost:8000/api/tests/")  
+    fetch("http://localhost:8000/api/labtests/")  
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch data from server");
