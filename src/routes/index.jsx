@@ -254,6 +254,7 @@ const AppRoutes = () => {
             }
           />
         </Route>
+  
 
         {/* Pharmacist Routes */}
         <Route path="pharmacist">

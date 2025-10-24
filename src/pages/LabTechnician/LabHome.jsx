@@ -26,7 +26,7 @@ const LabHome = () => {
       icon: FaUsers,
       color: '#26a69a',
       gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-      path: '',
+      path: '/app/lab-technician/testrequests',
     },
     {
       title: 'Test Results',
@@ -34,7 +34,7 @@ const LabHome = () => {
       icon: FaCalendarPlus,
       color: '#42a5f5',
       gradient: 'linear-gradient(135deg, #667eea 0%, #42a5f5 100%)',
-      path: '/receptionist/appointments/add',
+      path: '/app/lab-technician/testresults',
     },
     {
       title: 'Test bill',
@@ -42,7 +42,7 @@ const LabHome = () => {
       icon: FaFileInvoiceDollar,
       color: '#ab47bc',
       gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-      path: '/receptionist/billing/add',
+      path: '/app/lab-technician/testbill',
     },
   ];
 
