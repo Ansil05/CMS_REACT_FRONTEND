@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
+import { Row, Col, Card, Form } from 'react-bootstrap';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import Button from '../../elements/Button';
-import Select from '../../elements/Select';
 import DatePicker from '../../elements/DatePicker';
 import Input from '../../elements/Input';
 import Alert from '../../ui/Alert';
@@ -38,12 +37,8 @@ const AppointmentBookingForm = ({ onSuccess, onCancel, initialData = null }) => 
 
   const loadDoctors = async () => {
     try {
-      // Mock doctors - replace with actual API call
-      setDoctors([
-        { id: 1, name: 'Dr. Smith', specialization: 'Cardiologist' },
-        { id: 2, name: 'Dr. Johnson', specialization: 'Pediatrician' },
-        { id: 3, name: 'Dr. Williams', specialization: 'Orthopedic' },
-      ]);
+      const response = await receptionistService.doctors.getAll();
+      setDoctors(response.data);
     } catch (error) {
       console.error('Error loading doctors:', error);
     }
@@ -61,18 +56,10 @@ const AppointmentBookingForm = ({ onSuccess, onCancel, initialData = null }) => 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!validateRequired(formData.patient)) {
-      newErrors.patient = 'Please select a patient';
-    }
-    if (!validateRequired(formData.doc_id)) {
-      newErrors.doc_id = 'Please select a doctor';
-    }
-    if (!validateRequired(formData.appointment_date)) {
-      newErrors.appointment_date = 'Appointment date is required';
-    }
-    if (!validateRequired(formData.appointment_time)) {
-      newErrors.appointment_time = 'Appointment time is required';
-    }
+    if (!validateRequired(formData.patient)) newErrors.patient = 'Please select a patient';
+    if (!validateRequired(formData.doc_id)) newErrors.doc_id = 'Please select a doctor';
+    if (!validateRequired(formData.appointment_date)) newErrors.appointment_date = 'Appointment date is required';
+    if (!validateRequired(formData.appointment_time)) newErrors.appointment_time = 'Appointment time is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -107,46 +94,52 @@ const AppointmentBookingForm = ({ onSuccess, onCancel, initialData = null }) => 
   return (
     <Card className="border-0 shadow-sm" style={{ borderRadius: 'var(--radius-lg)' }}>
       <Card.Body className="p-4">
-        {error && (
-          <Alert variant="danger" dismissible onClose={() => setError('')}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
 
         <form onSubmit={handleSubmit}>
           <Row>
             <Col md={12}>
-              <Select
-                label="Patient"
-                name="patient"
-                value={formData.patient}
-                onChange={handleChange}
-                error={errors.patient}
-                required
-                options={patients.map(p => ({
-                  value: p.Patient_id,
-                  label: `${p.first_name} ${p.last_name} (ID: ${p.Patient_id})`
-                }))}
-                placeholder="Select patient"
-              />
+              <Form.Group className="mb-3">
+                <Form.Label>Patient <span className="text-danger">*</span></Form.Label>
+                <Form.Select
+                  name="patient"
+                  value={formData.patient}
+                  onChange={handleChange}
+                  isInvalid={!!errors.patient}
+                  style={{ height: '42px', fontSize: '15px' }}
+                >
+                  <option value="">Select Patient</option>
+                  {patients.map(p => (
+                    <option key={p.Patient_id} value={p.Patient_id}>
+                      {p.first_name} {p.last_name} (ID: {p.Patient_id})
+                    </option>
+                  ))}
+                </Form.Select>
+                {errors.patient && <div className="invalid-feedback d-block">{errors.patient}</div>}
+              </Form.Group>
             </Col>
           </Row>
 
           <Row>
             <Col md={12}>
-              <Select
-                label="Doctor"
-                name="doc_id"
-                value={formData.doc_id}
-                onChange={handleChange}
-                error={errors.doc_id}
-                required
-                options={doctors.map(d => ({
-                  value: d.id,
-                  label: `${d.name} - ${d.specialization}`
-                }))}
-                placeholder="Select doctor"
-              />
+              <Form.Group className="mb-3">
+                <Form.Label>Doctor <span className="text-danger">*</span></Form.Label>
+                <Form.Select
+                  name="doc_id"
+                  value={formData.doc_id}
+                  onChange={handleChange}
+                  isInvalid={!!errors.doc_id}
+                  style={{ height: '42px', fontSize: '15px' }}
+                >
+                  <option value="">Select Doctor</option>
+                  {doctors.map((d) => (
+                    <option key={d.Id} value={d.Staff?.StaffId}>
+                      Dr. {d.Staff?.FirstName} - {d.Specialization?.SpecializationName}
+                    </option>
+                  ))}
+                </Form.Select>
+                {errors.doc_id && <div className="invalid-feedback d-block">{errors.doc_id}</div>}
+              </Form.Group>
             </Col>
           </Row>
 
@@ -159,42 +152,32 @@ const AppointmentBookingForm = ({ onSuccess, onCancel, initialData = null }) => 
                 onChange={handleChange}
                 error={errors.appointment_date}
                 required
+                min={new Date().toISOString().split('T')[0]}
               />
             </Col>
             <Col md={6}>
-              <div className="form-group">
-                <label className="form-label form-label-required">Appointment Time</label>
-                <input
+              <Form.Group className="mb-3">
+                <Form.Label>Appointment Time <span className="text-danger">*</span></Form.Label>
+                <Form.Control
                   type="time"
                   name="appointment_time"
-                  className={`form-control ${errors.appointment_time ? 'is-invalid' : ''}`}
                   value={formData.appointment_time}
                   onChange={handleChange}
+                  isInvalid={!!errors.appointment_time}
+                  style={{ height: '42px' }}
                 />
-                {errors.appointment_time && (
-                  <div className="invalid-feedback">{errors.appointment_time}</div>
-                )}
-              </div>
+                {errors.appointment_time && <div className="invalid-feedback d-block">{errors.appointment_time}</div>}
+              </Form.Group>
             </Col>
           </Row>
 
           <div className="d-flex gap-2 justify-content-end mt-4">
             {onCancel && (
-              <Button
-                type="button"
-                variant="secondary"
-                icon={<FaTimes />}
-                onClick={onCancel}
-              >
+              <Button type="button" variant="secondary" icon={<FaTimes />} onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button
-              type="submit"
-              variant="gradient"
-              icon={<FaSave />}
-              loading={loading}
-            >
+            <Button type="submit" variant="gradient" icon={<FaSave />} loading={loading}>
               {initialData ? 'Update Appointment' : 'Book Appointment'}
             </Button>
           </div>

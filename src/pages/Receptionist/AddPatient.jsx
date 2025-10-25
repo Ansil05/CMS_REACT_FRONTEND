@@ -9,9 +9,10 @@ const AddPatient = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSuccess = () => {
-    // after successful registration navigate to patients list
-    navigate('/receptionist/patients');
-  };
+  // After successful registration, navigate to Book Appointments page
+  navigate('/app/receptionist/appointments/add');
+};
+
 
   if (loading) return <LoadingSpinner fullScreen message="Processing..." />;
 
