@@ -5,20 +5,23 @@ import Button from '../../elements/Button';
 import Input from '../../elements/Input';
 import Select from '../../elements/Select';
 import DatePicker from '../../elements/DatePicker';
+import TextArea from '../../elements/TextArea';
 import Alert from '../../ui/Alert';
 import { receptionistService } from '../../services/receptionistService';
-import { 
-  validateEmail, 
-  validatePhone, 
-  validateRequired, 
+import {
+  validateEmail,
+  validatePhone,
+  validateRequired,
   validateAge,
-  calculateAge 
+  calculateAge
 } from '../../utils/validations';
 import { BLOOD_GROUPS, GENDERS } from '../../config/constants';
 
 const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
   const [formData, setFormData] = useState({
     first_name: initialData?.first_name || '',
     last_name: initialData?.last_name || '',
@@ -29,11 +32,14 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
     address: initialData?.address || '',
     email: initialData?.email || '',
   });
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    // Clear error for this field
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -46,30 +52,37 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
     if (!validateRequired(formData.first_name)) {
       newErrors.first_name = 'First name is required';
     }
+
     if (!validateRequired(formData.last_name)) {
       newErrors.last_name = 'Last name is required';
     }
+
     if (!validateRequired(formData.dob)) {
       newErrors.dob = 'Date of birth is required';
     } else if (!validateAge(formData.dob)) {
       newErrors.dob = 'Invalid date of birth';
     }
+
     if (!validateRequired(formData.blood_group)) {
       newErrors.blood_group = 'Blood group is required';
     }
+
     if (!validateRequired(formData.gender)) {
       newErrors.gender = 'Gender is required';
     }
+
     if (!validateRequired(formData.phone_no)) {
       newErrors.phone_no = 'Phone number is required';
     } else if (!validatePhone(formData.phone_no)) {
-      newErrors.phone_no = 'Invalid phone number';
+      newErrors.phone_no = 'Invalid phone number (10 digits required)';
     }
+
     if (!validateRequired(formData.email)) {
       newErrors.email = 'Email is required';
     } else if (!validateEmail(formData.email)) {
       newErrors.email = 'Invalid email address';
     }
+
     if (!validateRequired(formData.address)) {
       newErrors.address = 'Address is required';
     }
@@ -92,45 +105,48 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
       
       if (initialData) {
         await receptionistService.patients.update(initialData.Patient_id, formData);
+        setSuccess('Patient updated successfully!');
       } else {
         await receptionistService.patients.create(formData);
+        setSuccess('Patient registered successfully!');
       }
       
-      if (onSuccess) onSuccess();
+      // Call onSuccess after 1 second
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+      }, 1000);
+      
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save patient');
+      console.error('Error saving patient:', err);
+      setError(err.response?.data?.message || 'Failed to save patient. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card className="border-0 shadow-sm" style={{ borderRadius: 'var(--radius-lg)' }}>
-      <Card.Header 
-        className="border-0 d-flex align-items-center gap-2"
-        style={{ 
-          background: 'var(--gradient-primary)',
-          color: 'white',
-          padding: '1rem 1.5rem'
-        }}
-      >
-        <FaUser size={20} />
-        <h5 className="mb-0 fw-semibold">
-          {initialData ? 'Update Patient Information' : 'Patient Registration Form'}
-        </h5>
-      </Card.Header>
-      
-      <Card.Body className="p-4">
-        {error && (
-          <Alert variant="danger" dismissible onClose={() => setError('')}>
-            {error}
-          </Alert>
-        )}
+    <form onSubmit={handleSubmit}>
+      <Card className="shadow-sm">
+        <Card.Body>
+          <h4 className="mb-4">
+            <FaUser className="me-2" />
+            {initialData ? 'Update Patient Information' : 'Patient Registration Form'}
+          </h4>
 
-        <form onSubmit={handleSubmit}>
+          {error && (
+            <Alert variant="danger" onClose={() => setError('')} dismissible>
+              {error}
+            </Alert>
+          )}
+
+          {success && (
+            <Alert variant="success" onClose={() => setSuccess('')} dismissible>
+              {success}
+            </Alert>
+          )}
+
           {/* Personal Information */}
-          <h6 className="fw-semibold mb-3 text-muted">Personal Information</h6>
-          
+          <h5 className="text-primary mb-3">Personal Information</h5>
           <Row>
             <Col md={6}>
               <Input
@@ -139,8 +155,8 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
                 value={formData.first_name}
                 onChange={handleChange}
                 error={errors.first_name}
-                required
                 placeholder="Enter first name"
+                required
               />
             </Col>
             <Col md={6}>
@@ -150,14 +166,14 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
                 value={formData.last_name}
                 onChange={handleChange}
                 error={errors.last_name}
-                required
                 placeholder="Enter last name"
+                required
               />
             </Col>
           </Row>
 
           <Row>
-            <Col md={4}>
+            <Col md={6}>
               <DatePicker
                 label="Date of Birth"
                 name="dob"
@@ -167,48 +183,54 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
                 required
               />
               {formData.dob && validateAge(formData.dob) && (
-                <small className="text-muted">Age: {calculateAge(formData.dob)} years</small>
+                <small className="text-muted">
+                  Age: {calculateAge(formData.dob)} years
+                </small>
               )}
             </Col>
-            <Col md={4}>
+            <Col md={6}>
               <Select
                 label="Gender"
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
                 error={errors.gender}
-                required
                 options={GENDERS.map(g => ({ value: g, label: g }))}
                 placeholder="Select gender"
+                required
               />
             </Col>
-            <Col md={4}>
+          </Row>
+
+          <Row>
+            <Col md={6}>
               <Select
                 label="Blood Group"
                 name="blood_group"
                 value={formData.blood_group}
                 onChange={handleChange}
                 error={errors.blood_group}
-                required
                 options={BLOOD_GROUPS.map(bg => ({ value: bg, label: bg }))}
                 placeholder="Select blood group"
+                required
               />
             </Col>
           </Row>
 
           {/* Contact Information */}
-          <h6 className="fw-semibold mb-3 mt-4 text-muted">Contact Information</h6>
-
+          <h5 className="text-primary mb-3 mt-4">Contact Information</h5>
           <Row>
             <Col md={6}>
               <Input
                 label="Phone Number"
                 name="phone_no"
+                type="tel"
                 value={formData.phone_no}
                 onChange={handleChange}
                 error={errors.phone_no}
+                placeholder="Enter 10-digit phone number"
+                maxLength={10}
                 required
-                placeholder="Enter phone number"
               />
             </Col>
             <Col md={6}>
@@ -219,54 +241,56 @@ const PatientRegistrationForm = ({ onSuccess, onCancel, initialData = null }) =>
                 value={formData.email}
                 onChange={handleChange}
                 error={errors.email}
-                required
                 placeholder="Enter email address"
+                required
               />
             </Col>
           </Row>
 
           <Row>
             <Col md={12}>
-              <div className="form-group">
-                <label className="form-label form-label-required">Address</label>
-                <textarea
-                  className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+              <div className="mb-3">
+                <label className="form-label">
+                  Address <span className="text-danger">*</span>
+                </label>
+                <TextArea
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  rows="3"
-                  placeholder="Enter full address"
+                  placeholder="Enter complete address"
+                  rows={3}
                 />
                 {errors.address && (
-                  <div className="invalid-feedback">{errors.address}</div>
+                  <div className="text-danger small mt-1">{errors.address}</div>
                 )}
               </div>
             </Col>
           </Row>
 
-          <div className="d-flex gap-2 justify-content-end mt-4 pt-3" style={{ borderTop: '1px solid var(--border-light)' }}>
+          {/* Action Buttons */}
+          <div className="d-flex justify-content-end gap-2 mt-4">
             {onCancel && (
               <Button
                 type="button"
-                variant="secondary"
-                icon={<FaTimes />}
+                variant="outline-secondary"
                 onClick={onCancel}
+                icon={<FaTimes />}
               >
                 Cancel
               </Button>
             )}
             <Button
               type="submit"
-              variant="gradient"
-              icon={<FaSave />}
+              variant="primary"
               loading={loading}
+              icon={<FaSave />}
             >
               {initialData ? 'Update Patient' : 'Register Patient'}
             </Button>
           </div>
-        </form>
-      </Card.Body>
-    </Card>
+        </Card.Body>
+      </Card>
+    </form>
   );
 };
 

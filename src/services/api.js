@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API URL from environment
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/reception';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/';
 
 // Create axios instance
 const api = axios.create({
@@ -25,6 +25,8 @@ api.interceptors.request.use(
     });
     return config;
   },
+
+
   (error) => {
     console.error('❌ Request Error:', error);
     return Promise.reject(error);
