@@ -1,5 +1,4 @@
 import api, { handleApiError } from './api';
-import { handleApiError } from './api';
 /**
  * Fetch authentication roles from the backend.
  * Uses the shared `api` axios instance and returns the roles array (or object)
@@ -30,4 +29,11 @@ export async function fetchAuthRoles() {
   }
 }
 
-export default fetchAuthRoles;
+export async function deleteUserByEmail(email) {
+  try {
+    const response = await api.delete(`auth/delete-user/`, { data: { email } });
+    return response.data;
+  } catch (err) {
+    handleApiError(err, { fallbackMessage: 'Failed to delete user.' });
+  }
+}
