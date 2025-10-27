@@ -9,7 +9,7 @@ export const receptionistService = {
     update: (id, data) => api.put(`/patients/${id}/`, data),
     delete: (id) => api.delete(`/patients/${id}/`),
   },
-
+  
   // Appointments CRUD
   appointments: {
     getAll: () => api.get('/appointments/'),

@@ -1,15 +1,15 @@
 import React from "react";
 import { Container,Row,Col } from "react-bootstrap";
-import StaffContainer from "../../components/Admin/StaffContainer";
+import DoctorContainer from "../../components/Admin/DoctorContainer";
 
-const StaffListPage = () => {
+const DoctorListPage = () => {
   return (
     <Row className="mt-5">
       <Col xs= {12} className="mb-4">
-      <StaffContainer />
-    </Col>
+        <DoctorContainer />
+      </Col>
     </Row>
   );
 };
 
-export default StaffListPage;
+export default DoctorListPage;

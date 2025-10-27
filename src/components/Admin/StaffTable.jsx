@@ -1,9 +1,10 @@
 import React from "react";
-import { Table } from "react-bootstrap";
+import { Table, Button } from "react-bootstrap";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
-const StaffTable = ({ staffs }) => {
+const StaffTable = ({ staffs, onEdit, onDelete }) => {
   return (
-    <Table striped bordered hover responsive>
+    <Table className="table-striped table-bordered table-hover" responsive>
       <thead className="table-dark">
         <tr>
           <th>Staff ID</th>
@@ -14,6 +15,7 @@ const StaffTable = ({ staffs }) => {
           <th>Email</th>
           <th>Phone</th>
           <th>Active</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -23,10 +25,27 @@ const StaffTable = ({ staffs }) => {
             <td>{staff.FirstName} {staff.LastName}</td>
             <td>{staff.DOB}</td>
             <td>{staff.Gender}</td>
-            <td>{staff.Role?.name || "N/A"}</td>
+            <td>{staff.RoleDetail?.RoleName || "N/A"}</td>
             <td>{staff.Email}</td>
             <td>{staff.PhoneNumber}</td>
             <td>{staff.IsActive ? "✅" : "❌"}</td>
+            <td>
+              <Button
+                variant="warning"
+                size="sm"
+                className="me-2"
+                onClick={() => onEdit(staff)}
+              >
+                <FaEdit />
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => onDelete(staff.StaffId, staff.Email)}
+              >
+                <FaTrash />
+              </Button>
+            </td>
           </tr>
         ))}
       </tbody>

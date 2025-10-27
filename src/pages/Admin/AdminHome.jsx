@@ -6,50 +6,91 @@ import {
 } from 'react-icons/fa';
 import { IoMdSettings } from "react-icons/io";
 import LoadingSpinner from '../../ui/LoadingSpinner';
+import StaffListPage from './StaffListPage';
+import DoctorListPage from './DoctorListPage';
 
 const AdminHome = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  const [counts, setCounts] = useState({
+    patients: 0,
+    doctors: 0,
+    appointments: 0,
+    staffs: 0,
+    roles: 0,
+  });
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchCounts = async () => {
+      setLoading(true);
+      try {
+        const { default: api } = await import('../../services/api'); // Adjust the path as necessary
+        const res = await api.get('/admin/counts');
+        if (!res.status === 200) throw new Error('Failed to fetch counts');
+        const data = res.data;
+        if (!mounted) return;
+        setCounts({
+          patients: data.patients ?? 0,
+          doctors: data.doctors ?? 0,
+          appointments: data.appointments ?? 0,
+          staffs: data.staffs ?? 0,
+          roles: data.roles ?? 0,
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchCounts();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) return <LoadingSpinner />;
+
   const dashboardCards = [
     {
-      title: 'Add Staff',
-      description: 'Register new staffs and manage their details',
+      title: 'Patients',
+      description: `${counts.patients} total patients`,
       icon: FaUserPlus,
       color: '#1e88e5',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      path: '/admin',
     },
     {
-      title: 'View staffs',
-      description: 'View, update, and manage staff records',
-      icon: FaUsers,
+      title: 'Doctors',
+      description: `${counts.doctors} total doctors`,
       color: '#26a69a',
       gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-      path: '/app/admin/staffs',
     },
     {
-      title: 'System Settings',
-      description: 'Manage System',
-      icon: IoMdSettings,
+      title: 'Appointments',
+      description: `${counts.appointments} total appointments`,
+      color: '#fb8c00',
+      gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+    },
+    {
+      title: 'Staffs',
+      description: `${counts.staffs} total staffs`,
       color: '#42a5f5',
       gradient: 'linear-gradient(135deg, #667eea 0%, #42a5f5 100%)',
-      path: '#',
     },
-    // {
-    //   title: 'Billing',
-    //   description: 'Generate and manage billing records',
-    //   icon: FaFileInvoiceDollar,
-    //   color: '#ab47bc',
-    //   gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    //   path: '/receptionist/billing/add',
-    // },
+    {
+      title: 'Roles',
+      description: `${counts.roles} total roles`,
+      color: '#ab47bc',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    },
   ];
 
   return (
-    <Container fluid>
+    <Container fluid className='py-4'>
       {/* Header */}
-      <div className="text-center mb-5">
+      <Row className="justify-content-center text-center mb-5">
+        <Col md={8}>
         <h1 
           className="fw-bold mb-3" 
           style={{ 
@@ -62,37 +103,24 @@ const AdminHome = () => {
         <p className="text-muted" style={{ fontSize: '1.125rem' }}>
           Manage Staffs, Users, and System
         </p>
-      </div>
+        </Col>
+      </Row>
 
       {/* Dashboard Cards */}
       <Row className="g-4 justify-content-center stagger-animation">
         {dashboardCards.map((card, index) => (
-          <Col xs={12} sm={6} lg={3} key={index}>
+          <Col xs={12} md={3} sm={6} lg={3} key={index}>
             <Card 
-              className="border-0 shadow-sm card-hover h-100"
-              onClick={() => navigate(card.path)}
+              className="border-0 shadow-sm card-hover h-100 text-center curved-card"
               style={{ 
                 cursor: 'pointer', 
                 borderRadius: 'var(--radius-xl)',
-                background: 'white',
+                background: card.gradient,
                 transition: 'all 0.3s ease'
               }}
             >
               <Card.Body className="p-4 text-center">
-                {/* Icon */}
-                <div 
-                  className="mx-auto mb-4 d-flex align-items-center justify-content-center"
-                  style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: 'var(--radius-xl)',
-                    background: card.gradient,
-                    boxShadow: `0 8px 16px ${card.color}40`
-                  }}
-                >
-                  <card.icon size={36} color="white" />
-                </div>
-
+              
                 {/* Title */}
                 <h5 className="fw-bold mb-2" style={{ color: 'var(--text-primary)' }}>
                   {card.title}
@@ -110,6 +138,16 @@ const AdminHome = () => {
           </Col>
         ))}
       </Row>
+      <Row className="g-4 justify-content-center stagger-animation">
+        <Col xs={8} sm={10} lg={12} className="mt-5">
+        <StaffListPage />
+        </Col>
+      </Row>
+      {/* <Row className="g-4 justify-content-center stagger-animation">
+        <Col xs={8} sm={10} lg={12} className="mt-5">
+        <DoctorListPage />
+        </Col>
+      </Row> */}
     </Container>
   );
 };
