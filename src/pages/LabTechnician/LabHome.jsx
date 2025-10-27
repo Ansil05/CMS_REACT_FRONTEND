@@ -26,7 +26,7 @@ const LabHome = () => {
       icon: FaUsers,
       color: '#26a69a',
       gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-      path: '',
+      path: '/app/lab-technician/testrequests',
     },
     {
       title: 'Test Results',
