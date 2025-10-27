@@ -25,10 +25,10 @@ const Sidebar = ({ isOpen, role, isDarkMode }) => {
         { path: '/receptionist/appointments', icon: FaCalendar, label: 'Appointments' },
         { path: '/receptionist/billing', icon: FaFileInvoiceDollar, label: 'Billing' },
       ],
-      labTechnician: [
-        { path: '/lab-technician', icon: FaHome, label: 'Dashboard' },
-        { path: '/lab-technician/tests', icon: FaFlask, label: 'Lab Tests' },
-        { path: '/lab-technician/reports', icon: FaChartBar, label: 'Reports' },
+      labtechnician: [
+        { path: '/app/lab-technician', icon: FaHome, label: 'Dashboard' },
+        { path: '/app/lab-technician/tests', icon: FaFlask, label: 'Lab Tests' },
+        { path: '/app/lab-technician/reports', icon: FaChartBar, label: 'Reports' },
       ],
       pharmacist: [
         { path: '/pharmacist', icon: FaHome, label: 'Dashboard' },

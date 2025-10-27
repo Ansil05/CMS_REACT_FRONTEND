@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../context/RoleContext';
+import Reports from '../components/LabTechnician/Reports';
+
 
 // Layouts
 import MainLayout from '../ui/MainLayout';
@@ -14,6 +16,7 @@ import NotFound from '../pages/NotFound';
 
 // Admin Pages
 import AdminHome from '../pages/Admin/AdminHome';
+import StaffListPage from '../pages/Admin/StaffListPage';
 
 // Doctor Pages
 import DoctorHome from '../pages/Doctor/DoctorHome';
@@ -35,16 +38,23 @@ import ViewBill from '../pages/Receptionist/ViewBill';
 
 // Lab Technician Pages
 import LabHome from '../pages/LabTechnician/LabHome';
+import TestRequests from '../pages/LabTechnician/TestRequests';
+import TestBill from '../pages/LabTechnician/TestBill';
+import TestResult from '../pages/LabTechnician/TestResult';
+import TestList from '../pages/LabTechnician/TestList';
 
 // Pharmacist Pages
 import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
+
+
+
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import PublicLandingPage from '../pages/PublicLandingPage';
-import TestList from '../pages/LabTechnician/TestList';
-import StaffListPage from '../pages/Admin/StaffListPage';
+
+
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -233,6 +243,7 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             } 
           />
+
         </Route>
 
         {/* Lab Technician Routes */}
@@ -253,8 +264,39 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             }
           />
+          <Route
+            path='test-requests'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
+                <TestRequests/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='test-results'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
+                <TestResult/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='test-billing'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
+                <TestBill/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='reports'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
+                <Reports/>
+              </RoleBasedRoute>
+            }
+          />
         </Route>
-  
 
         {/* Pharmacist Routes */}
         <Route path="pharmacist">

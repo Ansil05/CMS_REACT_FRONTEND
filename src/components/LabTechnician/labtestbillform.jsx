@@ -1,6 +1,6 @@
 // src/components/TestBillForm.jsx
 import React, { useState, useEffect } from "react";
-import { fetchTests, fetchPatients, createBill } from "../services/api";
+import { fetchLabTests, fetchLabRecords, createBill } from "../../services/labService";
 
 const TestBillForm = ({ onBillAdded }) => {
   const [formData, setFormData] = useState({
