@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaSave, FaCalendarCheck, FaMoneyBillWave, FaCreditCard, FaMobileAlt, FaMoneyCheck } from 'react-icons/fa';
 import Button from '../../elements/Button';
-import Select from '../../elements/Select';
 import DatePicker from '../../elements/DatePicker';
 import Input from '../../elements/Input';
 import Alert from '../../ui/Alert';
@@ -20,25 +19,22 @@ const AddAppointment = () => {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [errors, setErrors] = useState({});
   
-  // Form Data
   const [formData, setFormData] = useState({
     patient: '',
     doc_id: '',
     appointment_date: '',
     appointment_time: '',
-    reg_fee: '200',
-    doc_fee: '500',
+    reg_fee: '100',
+    doc_fee: '180',
     payment_mode: 'Cash'
   });
 
-  // Payment Modal State
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showBillPreview, setShowBillPreview] = useState(false);
-  const [generatedBill, setGeneratedBill] = useState(null);
-  const [generatedAppointment, setGeneratedAppointment] = useState(null);
-
-  const [errors, setErrors] = useState({});
+  const [generatedData, setGeneratedData] = useState({ bill: null, appointment: null });
 
   useEffect(() => {
     loadData();
@@ -48,18 +44,11 @@ const AddAppointment = () => {
     try {
       const [patientsRes, doctorsRes] = await Promise.all([
         receptionistService.patients.getAll(),
-        // If you have doctors endpoint, uncomment:
-        // receptionistService.doctors.getAll()
+        receptionistService.doctors.getAll()
       ]);
-      setPatients(patientsRes.data || []);
-      // setDoctors(doctorsRes.data || []);
       
-      // Mock doctors for now
-      setDoctors([
-        { id: 1, name: 'Dr. Smith', specialization: 'Cardiology' },
-        { id: 2, name: 'Dr. Johnson', specialization: 'Neurology' },
-        { id: 3, name: 'Dr. Williams', specialization: 'Orthopedics' }
-      ]);
+      setPatients(patientsRes.data || []);
+      setDoctors(doctorsRes.data || []);
     } catch (err) {
       setError('Failed to load data. Please refresh the page.');
     }
@@ -67,55 +56,51 @@ const AddAppointment = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-
-    // Load patient details when selected
+    
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
     if (name === 'patient' && value) {
       const patient = patients.find(p => p.Patient_id === parseInt(value));
       setSelectedPatient(patient);
     }
-
-    // Auto-calculate total when fees change
-    if (name === 'reg_fee' || name === 'doc_fee') {
-      calculateTotal();
+    if (name ==='doctor' && value){
+      const doctor = doctors.find(d=>d.Id === parseInt(value));
+      setSelectedDoctor(doctor);
     }
   };
 
   const calculateTotal = () => {
-    const regFee = parseFloat(formData.reg_fee) || 0;
-    const docFee = parseFloat(formData.doc_fee) || 0;
-    return regFee + docFee;
+    return (parseFloat(formData.reg_fee) || 0) + (parseFloat(formData.doc_fee) || 0);
   };
 
   const validate = () => {
     const newErrors = {};
     
-    if (!validateRequired(formData.patient)) {
+    if (!formData.patient || formData.patient === '') {
       newErrors.patient = 'Please select a patient';
     }
-    if (!validateRequired(formData.doc_id)) {
+    
+    if (!formData.doc_id || formData.doc_id === '') {
       newErrors.doc_id = 'Please select a doctor';
     }
+    
     if (!validateRequired(formData.appointment_date)) {
       newErrors.appointment_date = 'Please select appointment date';
     }
+    
     if (!validateRequired(formData.appointment_time)) {
       newErrors.appointment_time = 'Please select appointment time';
     }
-    if (!validateRequired(formData.reg_fee) || parseFloat(formData.reg_fee) <= 0) {
-      newErrors.reg_fee = 'Please enter a valid registration fee';
-    }
-    if (!validateRequired(formData.doc_fee) || parseFloat(formData.doc_fee) <= 0) {
-      newErrors.doc_fee = 'Please enter a valid consultation fee';
-    }
-    if (!validateRequired(formData.payment_mode)) {
-      newErrors.payment_mode = 'Please select payment mode';
-    }
+
+    ['reg_fee', 'doc_fee'].forEach(field => {
+      if (!validateRequired(formData[field]) || parseFloat(formData[field]) <= 0) {
+        newErrors[field] = `Please enter a valid ${field === 'reg_fee' ? 'registration' : 'consultation'} fee`;
+      }
+    });
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -127,14 +112,7 @@ const AddAppointment = () => {
       setError('Please fill all required fields correctly');
       return;
     }
-
-    // If Cash payment, show confirmation modal directly
-    // If UPI/Card, show payment modal first
-    if (formData.payment_mode === 'Cash') {
-      setShowPaymentModal(true);
-    } else {
-      setShowPaymentModal(true);
-    }
+    setShowPaymentModal(true);
   };
 
   const handlePaymentConfirmed = async (paymentDetails) => {
@@ -143,44 +121,106 @@ const AddAppointment = () => {
     setError('');
 
     try {
-      // Create appointment
-      const appointmentData = {
-        patient: formData.patient,
-        doc_id: formData.doc_id,
+      // ✅ Check for empty BEFORE converting
+      if (!formData.patient || formData.patient === '' || formData.patient === '0') {
+        setError('Please select a patient');
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.doc_id || formData.doc_id === '' || formData.doc_id === '0') {
+        setError('Please select a doctor');
+        setLoading(false);
+        return;
+      }
+
+      // ✅ NOW convert to integers
+      const patientId = parseInt(formData.patient, 10);
+      const doctorId = parseInt(formData.doc_id, 10);
+
+      console.log('✅ Converted Values:', { 
+        patientId, 
+        doctorId,
+        isPatientValid: !isNaN(patientId),
+        isDoctorValid: !isNaN(doctorId)
+      });
+
+      // ✅ Double check they're valid numbers
+      if (isNaN(patientId)) {
+        setError('Invalid patient ID');
+        setLoading(false);
+        return;
+      }
+
+      if (isNaN(doctorId)) {
+        setError('Invalid doctor ID');
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Create Appointment
+      const appointmentPayload = {
+        patient: patientId,
+        doc_id: doctorId,
         appointment_date: formData.appointment_date,
         appointment_time: formData.appointment_time,
+        status: 'Scheduled'
       };
-      const appointmentRes = await receptionistService.appointments.create(appointmentData);
+
+      console.log('✅ Final Payload:', appointmentPayload);
+
+      const appointmentResponse = await receptionistService.appointments.create(appointmentPayload);
       
-      // Create bill
-      const billData = {
-        patient: formData.patient,
-        appointment: appointmentRes.data.id,
-        reg_fee: formData.reg_fee,
-        doc_fee: formData.doc_fee,
+      if (!appointmentResponse.data) throw new Error('Failed to create appointment');
+
+      const appointmentId = appointmentResponse.data.appointment_id || appointmentResponse.data.id;
+
+      // ✅ Generate Bill
+      const totalAmount = calculateTotal();
+      const billPayload = {
+        patient: patientId,
+        appointment: appointmentId,
+        reg_fee: parseFloat(formData.reg_fee),
+        doc_fee: parseFloat(formData.doc_fee),
+        total_amount: totalAmount,
+        paid_amount: totalAmount,
+        balance_amount: 0,
         payment_mode: paymentDetails.mode,
         payment_status: 'PAID',
         payment_reference: paymentDetails.reference,
-        payment_timestamp: paymentDetails.timestamp
+        payment_timestamp: paymentDetails.timestamp,
+        bill_date: new Date().toISOString()
       };
-      const billRes = await receptionistService.bills.create(billData);
 
-      // Store generated data for bill preview
-      setGeneratedAppointment({
-        ...appointmentRes.data,
-        doctor_name: doctors.find(d => d.id === parseInt(formData.doc_id))?.name,
-        department: doctors.find(d => d.id === parseInt(formData.doc_id))?.specialization,
-        token_no: `T${Date.now().toString().slice(-6)}`
-      });
-      setGeneratedBill({
-        ...billRes.data,
-        ...billData
+      const billResponse = await receptionistService.bills.create(billPayload);
+
+      if (!billResponse.data) throw new Error('Failed to generate bill');
+
+      // ✅ Find doctor using Id
+      const selectedDoctor = doctors.find(d => d.Id === doctorId);
+      
+      setGeneratedData({
+        bill: {
+          ...billResponse.data,
+          reg_fee: formData.reg_fee,
+          doc_fee: formData.doc_fee,
+          payment_mode: paymentDetails.mode
+        },
+        appointment: {
+          ...appointmentResponse.data,
+          doctor_name: selectedDoctor?.Staff?.FirstName || 'Doctor',
+          department: selectedDoctor?.Specialization?.SpecializationName || 'General',
+          token_no: appointmentResponse.data.token_number || `TKN${Date.now().toString().slice(-6)}`
+        }
       });
 
       setSuccess('Appointment booked and bill generated successfully!');
       setShowBillPreview(true);
+
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create appointment and bill');
+      console.error('❌ Error:', err);
+      console.error('❌ Error Response:', err.response?.data);
+      setError(err.response?.data?.message || err.message || 'Failed to process appointment and billing');
     } finally {
       setLoading(false);
     }
@@ -191,14 +231,13 @@ const AddAppointment = () => {
     navigate('/app/receptionist/appointments');
   };
 
-  // If bill preview is shown, render only that
-  if (showBillPreview && generatedBill && selectedPatient) {
+  if (showBillPreview && generatedData.bill && selectedPatient) {
     return (
       <Container fluid className="py-4">
         <BillPreview
-          bill={generatedBill}
+          bill={generatedData.bill}
           patient={selectedPatient}
-          appointment={generatedAppointment}
+          appointment={generatedData.appointment}
           onClose={handleCloseBillPreview}
         />
       </Container>
@@ -206,15 +245,21 @@ const AddAppointment = () => {
   }
 
   const totalAmount = calculateTotal();
+  const paymentModes = [
+    { value: 'Cash', icon: FaMoneyBillWave, color: 'success', label: 'Cash Payment' },
+    { value: 'UPI', icon: FaMobileAlt, color: 'primary', label: 'UPI / QR Code' },
+    { value: 'Card', icon: FaCreditCard, color: 'info', label: 'Debit / Credit Card' },
+    { value: 'Cheque', icon: FaMoneyCheck, color: 'warning', label: 'Cheque' }
+  ];
 
   return (
     <Container fluid className="py-4">
       <Row className="mb-4">
         <Col>
           <div className="d-flex align-items-center gap-3">
-            <Button
-              variant="outline-primary"
-              icon={<FaArrowLeft />}
+            <Button 
+              variant="outline-primary" 
+              icon={<FaArrowLeft />} 
               onClick={() => navigate('/app/receptionist/appointments')}
             >
               Back
@@ -232,7 +277,6 @@ const AddAppointment = () => {
           {error}
         </Alert>
       )}
-
       {success && (
         <Alert variant="success" dismissible onClose={() => setSuccess('')}>
           {success}
@@ -242,7 +286,6 @@ const AddAppointment = () => {
       <form onSubmit={handleSubmitClick}>
         <Row>
           <Col lg={8}>
-            {/* Appointment Details Section */}
             <Card className="mb-4 shadow-sm">
               <Card.Header className="bg-primary text-white">
                 <h5 className="mb-0">
@@ -252,40 +295,61 @@ const AddAppointment = () => {
               </Card.Header>
               <Card.Body>
                 <Row>
-                  <Col md={6}>
-                    <Select
-                      label="Select Patient"
-                      name="patient"
-                      value={formData.patient}
-                      onChange={handleChange}
-                      error={errors.patient}
-                      required
-                    >
-                      <option value="">Choose Patient</option>
-                      {patients.map(patient => (
-                        <option key={patient.Patient_id} value={patient.Patient_id}>
-                          {patient.first_name} {patient.last_name} - {patient.phone_no}
-                        </option>
-                      ))}
-                    </Select>
+                  <Col md={6} className="mb-3">
+                    <Form.Group>
+                      <Form.Label>
+                        Patient <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        name="patient"
+                        value={formData.patient}
+                        onChange={handleChange}
+                        isInvalid={!!errors.patient}
+                        style={{ height: '45px', fontSize: '15px' }}
+                      >
+                        <option value="">Select Patient</option>
+                        {patients.map(p => (
+                          <option key={`patient-${p.Patient_id}`} value={p.Patient_id}>
+                            {p.first_name} {p.last_name} (ID: {p.Patient_id})
+                          </option>
+                        ))}
+                      </Form.Select>
+                      {errors.patient && (
+                        <Form.Control.Feedback type="invalid" className="d-block">
+                          {errors.patient}
+                        </Form.Control.Feedback>
+                      )}
+                    </Form.Group>
                   </Col>
 
-                  <Col md={6}>
-                    <Select
-                      label="Select Doctor"
-                      name="doc_id"
-                      value={formData.doc_id}
-                      onChange={handleChange}
-                      error={errors.doc_id}
-                      required
-                    >
-                      <option value="">Choose Doctor</option>
-                      {doctors.map(doctor => (
-                        <option key={doctor.id} value={doctor.id}>
-                          {doctor.name} - {doctor.specialization}
-                        </option>
-                      ))}
-                    </Select>
+                  <Col md={6} className="mb-3">
+                    <Form.Group>
+                      <Form.Label>
+                        Doctor <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        name="doc_id"
+                        value={formData.doc_id}
+                        onChange={handleChange}
+                        isInvalid={!!errors.doc_id}
+                        style={{ height: '45px', fontSize: '15px' }}
+                      >
+                        <option value="">Select Doctor</option>
+                        {doctors.map((d) => (
+                          <option
+                            key={`doctor-${d.DoctorId}`}
+                            value={d.DoctorId}
+                          >
+                           Dr. {d.StaffDetail?.FirstName} {d.StaffDetail?.LastName} - {d.SpecializationDetails?.SpecializationName}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      {errors.doc_id && (
+                        <Form.Control.Feedback type="invalid" className="d-block">
+                          {errors.doc_id}
+                        </Form.Control.Feedback>
+                      )}
+                    </Form.Group>
                   </Col>
 
                   <Col md={6}>
@@ -315,7 +379,6 @@ const AddAppointment = () => {
               </Card.Body>
             </Card>
 
-            {/* Billing Section */}
             <Card className="mb-4 shadow-sm">
               <Card.Header className="bg-success text-white">
                 <h5 className="mb-0">
@@ -326,35 +389,32 @@ const AddAppointment = () => {
               <Card.Body>
                 <Row>
                   <Col md={6}>
-                    <Input
-                      label="Registration Fee"
-                      type="number"
-                      name="reg_fee"
-                      value={formData.reg_fee}
-                      onChange={handleChange}
-                      error={errors.reg_fee}
-                      required
-                      min="0"
-                      step="0.01"
+                    <Input 
+                      label="Registration Fee" 
+                      type="number" 
+                      name="reg_fee" 
+                      value={formData.reg_fee} 
+                      onChange={handleChange} 
+                      error={errors.reg_fee} 
+                      required 
+                      min="0" 
+                      step="0.01" 
                     />
                   </Col>
-
                   <Col md={6}>
-                    <Input
-                      label="Consultation Fee"
-                      type="number"
-                      name="doc_fee"
-                      value={formData.doc_fee}
-                      onChange={handleChange}
-                      error={errors.doc_fee}
-                      required
-                      min="0"
-                      step="0.01"
+                    <Input 
+                      label="Consultation Fee" 
+                      type="number" 
+                      name="doc_fee" 
+                      value={formData.doc_fee} 
+                      onChange={handleChange} 
+                      error={errors.doc_fee} 
+                      required 
+                      min="0" 
+                      step="0.01" 
                     />
                   </Col>
                 </Row>
-
-                {/* Total Amount Display */}
                 <div className="mt-3 p-3 bg-light rounded text-center">
                   <p className="text-muted mb-1">Total Amount</p>
                   <h3 className="mb-0 text-success">₹{totalAmount.toFixed(2)}</h3>
@@ -362,7 +422,6 @@ const AddAppointment = () => {
               </Card.Body>
             </Card>
 
-            {/* Payment Mode Section */}
             <Card className="mb-4 shadow-sm">
               <Card.Header className="bg-info text-white">
                 <h5 className="mb-0">
@@ -372,64 +431,64 @@ const AddAppointment = () => {
               </Card.Header>
               <Card.Body>
                 <div className="row g-3">
-                  {[
-                    { value: 'Cash', icon: <FaMoneyBillWave />, color: 'success', label: 'Cash Payment' },
-                    { value: 'UPI', icon: <FaMobileAlt />, color: 'primary', label: 'UPI / QR Code' },
-                    { value: 'Card', icon: <FaCreditCard />, color: 'info', label: 'Debit / Credit Card' },
-                    { value: 'Cheque', icon: <FaMoneyCheck />, color: 'warning', label: 'Cheque' }
-                  ].map(mode => (
-                    <div key={mode.value} className="col-md-6">
-                      <div
-                        className={`p-3 border rounded cursor-pointer ${
-                          formData.payment_mode === mode.value
-                            ? `border-${mode.color} bg-${mode.color} bg-opacity-10`
-                            : 'border-secondary'
-                        }`}
-                        style={{ cursor: 'pointer', transition: 'all 0.3s' }}
-                        onClick={() => setFormData(prev => ({ ...prev, payment_mode: mode.value }))}
-                      >
-                        <div className="d-flex align-items-center gap-3">
-                          <input
-                            type="radio"
-                            name="payment_mode"
-                            value={mode.value}
-                            checked={formData.payment_mode === mode.value}
-                            onChange={handleChange}
-                            className="form-check-input"
-                            style={{ cursor: 'pointer' }}
-                          />
-                          <div className={`text-${mode.color}`} style={{ fontSize: '24px' }}>
-                            {mode.icon}
-                          </div>
-                          <div>
+                  {paymentModes.map(mode => {
+                    const Icon = mode.icon;
+                    return (
+                      <div key={mode.value} className="col-md-6">
+                        <div
+                          className={`p-3 border rounded cursor-pointer ${
+                            formData.payment_mode === mode.value
+                              ? `border-${mode.color} bg-${mode.color} bg-opacity-10`
+                              : 'border-secondary'
+                          }`}
+                          style={{ cursor: 'pointer', transition: 'all 0.3s' }}
+                          onClick={() => setFormData(prev => ({ ...prev, payment_mode: mode.value }))}
+                        >
+                          <div className="d-flex align-items-center gap-3">
+                            <input 
+                              type="radio" 
+                              name="payment_mode" 
+                              value={mode.value}
+                              checked={formData.payment_mode === mode.value}
+                              onChange={handleChange} 
+                              className="form-check-input" 
+                            />
+                            <Icon className={`text-${mode.color}`} size={24} />
                             <strong>{mode.label}</strong>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-                {errors.payment_mode && (
-                  <div className="text-danger small mt-2">{errors.payment_mode}</div>
-                )}
               </Card.Body>
             </Card>
           </Col>
 
-          {/* Summary Sidebar */}
           <Col lg={4}>
             <Card className="shadow-sm sticky-top" style={{ top: '20px' }}>
-              <Card.Header className="bg-gradient text-white">
+              <Card.Header 
+                className="bg-gradient text-white" 
+                style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+              >
                 <h5 className="mb-0">Summary</h5>
               </Card.Header>
               <Card.Body>
                 {selectedPatient ? (
                   <>
                     <h6 className="text-primary mb-3">Patient Information</h6>
-                    <p className="mb-1"><strong>Name:</strong> {selectedPatient.first_name} {selectedPatient.last_name}</p>
-                    <p className="mb-1"><strong>Age:</strong> {selectedPatient.age || 'N/A'} years</p>
-                    <p className="mb-1"><strong>Phone:</strong> {selectedPatient.phone_no}</p>
-                    <p className="mb-3"><strong>Blood Group:</strong> {selectedPatient.blood_group || 'N/A'}</p>
+                    <p className="mb-1">
+                      <strong>Name:</strong> {selectedPatient.first_name} {selectedPatient.last_name}
+                    </p>
+                    <p className="mb-1">
+                      <strong>Age:</strong> {selectedPatient.age || 'N/A'} years
+                    </p>
+                    <p className="mb-1">
+                      <strong>Phone:</strong> {selectedPatient.phone_no}
+                    </p>
+                    <p className="mb-3">
+                      <strong>Blood Group:</strong> {selectedPatient.blood_group || 'N/A'}
+                    </p>
                     <hr />
                   </>
                 ) : (
@@ -456,12 +515,12 @@ const AddAppointment = () => {
                   <h6 className="mb-0">{formData.payment_mode}</h6>
                 </div>
 
-                <Button
-                  type="submit"
-                  variant="gradient"
-                  fullWidth
-                  loading={loading}
-                  icon={<FaSave />}
+                <Button 
+                  type="submit" 
+                  variant="gradient" 
+                  fullWidth 
+                  loading={loading} 
+                  icon={<FaSave />} 
                   size="lg"
                 >
                   Book Appointment & Generate Bill
@@ -472,10 +531,9 @@ const AddAppointment = () => {
         </Row>
       </form>
 
-      {/* Payment Modal */}
       <PaymentModal
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
+        show={showPaymentModal}
+        onHide={() => setShowPaymentModal(false)}
         onPaymentConfirmed={handlePaymentConfirmed}
         amount={totalAmount}
         patientName={selectedPatient ? `${selectedPatient.first_name} ${selectedPatient.last_name}` : ''}

@@ -123,7 +123,7 @@ const Billing = () => {
             <Button
               variant="gradient"
               icon={<FaPlus />}
-              onClick={() => navigate('/receptionist/billing/add')}
+              onClick={() => navigate('/app/receptionist/appointments/add')}
             >
               Generate Bill
             </Button>

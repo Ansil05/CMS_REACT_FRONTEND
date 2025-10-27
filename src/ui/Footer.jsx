@@ -21,7 +21,7 @@ const Footer = ({ isDarkMode }) => {
         <div className="row align-items-center">
           <div className="col-md-6 text-center text-md-start mb-3 mb-md-0">
             <p className="mb-0" style={{ fontSize: '0.875rem' }}>
-              © {currentYear} <strong style={{ color: isDarkMode ? 'white' : '#0d47a1' }}>Clinical Management System</strong>. All rights reserved. 
+              © {currentYear} <strong style={{ color: isDarkMode ? 'white' : '#0d47a1' }}>ANGEL</strong>. All rights reserved. 
               | Made with <FaHeart size={12} color="#f43f5e" /> by Team <strong style={{ color: isDarkMode ? 'white' : '#0d47a1' }}>THE BOYS 4</strong>
             </p>
           </div>

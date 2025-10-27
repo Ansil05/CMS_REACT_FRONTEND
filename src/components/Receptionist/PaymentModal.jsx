@@ -1,164 +1,115 @@
 import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { FaTimes, FaCheckCircle, FaMoneyBillWave, FaCreditCard, FaMobileAlt } from 'react-icons/fa';
-import QRCode from 'react-qr-code';
+import { FaTimes, FaCheckCircle, FaCreditCard, FaMoneyBillWave, FaMobileAlt } from 'react-icons/fa';
 import Button from '../../elements/Button';
+import QRCode from 'react-qr-code';
 
-const PaymentModal = ({ 
-  isOpen, 
-  onClose, 
-  onPaymentConfirmed, 
-  amount, 
-  patientName,
-  paymentMode 
-}) => {
-  const [processing, setProcessing] = useState(false);
+const HOSPITAL_UPI_ID = 'faithhospital@upi';
 
-  // Hospital UPI Details - Update these with your actual details
-  const HOSPITAL_UPI_ID = 'faithhospital@upi';
-  const HOSPITAL_NAME = 'Faith Multi Speciality Hospital';
+const PaymentModal = ({ show, onHide, onPaymentConfirmed, amount, patientName, paymentMode }) => {
+  const [confirming, setConfirming] = useState(false);
 
-  // Generate UPI payment string
-  const generateUPIString = () => {
-    return `upi://pay?pa=${HOSPITAL_UPI_ID}&pn=${encodeURIComponent(HOSPITAL_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(`Appointment - ${patientName}`)}`;
-  };
+  const handleConfirmPayment = () => {
+    setConfirming(true);
+    
+    const paymentDetails = {
+      mode: paymentMode,
+      reference: `TXN${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      amount: amount
+    };
 
-  const handleConfirmPayment = async () => {
-    setProcessing(true);
-    // Simulate payment confirmation delay
     setTimeout(() => {
-      setProcessing(false);
-      onPaymentConfirmed({
-        mode: paymentMode,
-        amount: amount,
-        timestamp: new Date().toISOString(),
-        reference: `PAY${Date.now()}`,
-      });
+      onPaymentConfirmed(paymentDetails);
+      setConfirming(false);
+      onHide();
     }, 1000);
   };
 
-  const getPaymentIcon = () => {
+  const renderPaymentContent = () => {
     switch (paymentMode) {
       case 'UPI':
-        return <FaMobileAlt size={24} className="text-primary" />;
+        return (
+          <div className="text-center">
+            <FaMobileAlt size={40} className="text-primary mb-3" />
+            <h5>Scan QR Code</h5>
+            <div className="d-flex justify-content-center my-4">
+              <div className="p-3 bg-white border rounded">
+                <QRCode value={`upi://pay?pa=${HOSPITAL_UPI_ID}&pn=FaithHospital&am=${amount}&cu=INR`} size={200} />
+              </div>
+            </div>
+            <p className="text-muted small">Scan this QR code using any UPI app</p>
+            <p className="text-muted small">(Google Pay, PhonePe, Paytm, etc.)</p>
+          </div>
+        );
+
       case 'Card':
-        return <FaCreditCard size={24} className="text-info" />;
+        return (
+          <div className="text-center">
+            <FaCreditCard size={40} className="text-info mb-3" />
+            <h5>Card Payment</h5>
+            <p className="my-4">Please proceed with card payment at the counter.</p>
+            <div className="alert alert-info">
+              <small>Swipe/Insert/Tap your card on POS machine</small>
+            </div>
+          </div>
+        );
+
       case 'Cash':
-        return <FaMoneyBillWave size={24} className="text-success" />;
+        return (
+          <div className="text-center">
+            <FaMoneyBillWave size={40} className="text-success mb-3" />
+            <h5>Cash Payment</h5>
+            <div className="my-4">
+              <h3 className="text-success">₹{amount.toFixed(2)}</h3>
+              <p className="text-muted">Please collect cash from patient</p>
+            </div>
+          </div>
+        );
+
+      case 'Cheque':
+        return (
+          <div className="text-center">
+            <FaCheckCircle size={40} className="text-warning mb-3" />
+            <h5>Cheque Payment</h5>
+            <p className="my-4">Please collect cheque from patient and verify details.</p>
+            <div className="alert alert-warning">
+              <small>Verify: Bank name, Account number, Signature, Date</small>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   return (
-    <Modal show={isOpen} onHide={onClose} centered size="md">
-      <Modal.Header style={{ 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        borderRadius: '8px 8px 0 0'
-      }}>
-        <div className="d-flex align-items-center gap-2 w-100">
-          {getPaymentIcon()}
-          <h5 className="mb-0">Complete Payment - {paymentMode}</h5>
-        </div>
-        <button 
-          onClick={onClose} 
-          style={{ 
-            background: 'transparent', 
-            border: 'none', 
-            color: 'white',
-            fontSize: '24px',
-            cursor: 'pointer'
-          }}
-        >
-          <FaTimes />
-        </button>
+    <Modal show={show} onHide={onHide} centered size="md">
+      <Modal.Header closeButton>
+        <Modal.Title>Complete Payment - {paymentMode}</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body className="text-center py-4">
-        {/* Amount Display */}
-        <div className="mb-4">
-          <p className="text-muted mb-1">Total Amount</p>
-          <h2 className="text-primary mb-0" style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>
-            ₹{amount.toFixed(2)}
-          </h2>
+      <Modal.Body>
+        <div className="mb-3">
+          <p><strong>Patient:</strong> {patientName}</p>
+          <p><strong>Amount:</strong> ₹{amount.toFixed(2)}</p>
         </div>
-
-        {/* UPI QR Code */}
-        {paymentMode === 'UPI' && (
-          <>
-            <div className="d-flex justify-content-center mb-4">
-              <div style={{ 
-                padding: '20px', 
-                background: 'white', 
-                borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-              }}>
-                <QRCode 
-                  value={generateUPIString()} 
-                  size={220}
-                  level="H"
-                  includeMargin={true}
-                />
-              </div>
-            </div>
-
-            <div className="alert alert-info mb-4" style={{ textAlign: 'left' }}>
-              <h6 className="mb-2">📱 How to Pay:</h6>
-              <ol className="mb-0 ps-3">
-                <li>Open any UPI app (GPay, PhonePe, Paytm)</li>
-                <li>Scan this QR code</li>
-                <li>Verify amount & patient name</li>
-                <li>Complete the payment</li>
-              </ol>
-            </div>
-
-            <p className="text-muted small mb-3">
-              <strong>UPI ID:</strong> {HOSPITAL_UPI_ID}
-            </p>
-          </>
-        )}
-
-        {/* Card Payment */}
-        {paymentMode === 'Card' && (
-          <div className="alert alert-info">
-            <FaCreditCard size={48} className="mb-3 text-info" />
-            <p className="mb-0">Please proceed with card payment at the counter.</p>
-            <p className="text-muted small mb-0">Card machine will be used for transaction</p>
-          </div>
-        )}
-
-        {/* Cash Payment */}
-        {paymentMode === 'Cash' && (
-          <div className="alert alert-success">
-            <FaMoneyBillWave size={48} className="mb-3 text-success" />
-            <p className="mb-0">Please collect ₹{amount.toFixed(2)} cash from patient.</p>
-            <p className="text-muted small mb-0">Ensure you count the cash correctly</p>
-          </div>
-        )}
-
-        {/* Patient Info */}
-        <div className="mt-4 p-3 bg-light rounded">
-          <p className="mb-1 text-muted small">Payment for</p>
-          <h6 className="mb-0">{patientName}</h6>
-        </div>
+        <hr />
+        {renderPaymentContent()}
       </Modal.Body>
 
       <Modal.Footer>
-        <Button 
-          variant="secondary" 
-          onClick={onClose}
-          disabled={processing}
-        >
+        <Button variant="secondary" onClick={onHide} icon={<FaTimes />}>
           Cancel
         </Button>
         <Button 
           variant="success" 
-          onClick={handleConfirmPayment}
-          loading={processing}
+          onClick={handleConfirmPayment} 
+          loading={confirming}
           icon={<FaCheckCircle />}
         >
-          {processing ? 'Confirming...' : 'Payment Received'}
+          {confirming ? 'Processing...' : 'Confirm Payment'}
         </Button>
       </Modal.Footer>
     </Modal>

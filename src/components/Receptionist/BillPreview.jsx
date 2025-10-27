@@ -6,6 +6,8 @@ import Button from '../../elements/Button';
 // import { sendBillReceipt, isValidEmail } from '../../services/emailService';
 import { formatDate, formatCurrency } from '../../utils/validations';
 import Alert from '../../ui/Alert';
+import { generateBillPDF } from '../../utils/pdfGenerator';
+
 
 const BillPreview = ({ 
   bill, 
@@ -23,7 +25,7 @@ const BillPreview = ({
   };
 
   const handleDownloadPDF = () => {
-    generateSimpleBillPDF(bill, patient);
+    generateBillPDF(bill, patient, appointment);
   };
 
   const handleSendEmail = async () => {
