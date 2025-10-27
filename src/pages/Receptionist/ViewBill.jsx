@@ -98,7 +98,7 @@ const ViewBill = () => {
                     letterSpacing: '2px'
                   }}
                 >
-                  Clinic Receipt
+                  Clinic Reciept
                 </h2>
                 <div 
                   style={{ 
@@ -132,7 +132,7 @@ const ViewBill = () => {
                 </div>
                 <div className="d-flex mb-2">
                   <strong style={{ minWidth: '150px' }}>Doctor:</strong>
-                  <span>Doctor ID #{appointment.doc_id}</span>
+                  <span>Doctor ID #{doctors.DoctorId}</span>
                 </div>
               </div>
 
