@@ -1,9 +1,12 @@
-import React from 'react'
+import React from 'react';
+import PharmacyDashboard from '../../components/Pharmasist/PharmacyDashboard';
 
 const PharmacyHome = () => {
   return (
-    <div>PharmacyHome</div>
-  )
-}
+    <div>
+      <PharmacyDashboard />
+    </div>
+  );
+};
 
-export default PharmacyHome
+export default PharmacyHome;
