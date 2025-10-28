@@ -1,13 +1,14 @@
 import React from "react";
-import { Container } from "react-bootstrap";
+import { Container,Row,Col } from "react-bootstrap";
 import StaffContainer from "../../components/Admin/StaffContainer";
 
-const StaffListPage = () => {
+const StaffListPage = ({ fetchStats }) => {
   return (
-    <Container className="mt-4">
-      <h3 className="mb-4 text-center">Staff List</h3>
-      <StaffContainer />
-    </Container>
+    <Row className="mt-5">
+      <Col xs= {12} className="mb-4">
+      <StaffContainer fetchStats={fetchStats} />
+    </Col>
+    </Row>
   );
 };
 

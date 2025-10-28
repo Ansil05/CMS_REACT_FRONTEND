@@ -15,6 +15,7 @@ import NotFound from '../pages/NotFound';
 
 // Admin Pages
 import AdminHome from '../pages/Admin/AdminHome';
+import StaffListPage from '../pages/Admin/StaffListPage';
 
 // Doctor Pages
 import DoctorHome from '../pages/Doctor/DoctorHome';
@@ -36,16 +37,23 @@ import ViewBill from '../pages/Receptionist/ViewBill';
 
 // Lab Technician Pages
 import LabHome from '../pages/LabTechnician/LabHome';
+import TestRequests from '../pages/LabTechnician/TestRequests';
+import TestBill from '../pages/LabTechnician/TestBill';
+import TestResult from '../pages/LabTechnician/TestResult';
+import TestList from '../pages/LabTechnician/TestList';
 
 // Pharmacist Pages
 import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
+
+
+
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import PublicLandingPage from '../pages/PublicLandingPage';
-import TestList from '../pages/LabTechnician/TestList';
-import StaffListPage from '../pages/Admin/StaffListPage';
+
+
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -106,6 +114,7 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             }
           />
+          
         </Route>
 
         {/* Doctor Routes */}
@@ -113,7 +122,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['doctor']}>
+              <RoleBasedRoute allowedRoles={['doctor', 'admin']}>
                 <DoctorHome />
               </RoleBasedRoute>
             }
@@ -122,7 +131,7 @@ const AppRoutes = () => {
           <Route 
             path="appointments" 
             element={
-              <RoleBasedRoute allowedRoles={['doctor']}>
+              <RoleBasedRoute allowedRoles={['doctor', 'admin']}>
                 <ViewAppointments />
               </RoleBasedRoute>
             } 
@@ -130,7 +139,7 @@ const AppRoutes = () => {
           <Route 
             path="consult/:appointmentId" 
             element={
-              <RoleBasedRoute allowedRoles={['doctor']}>
+              <RoleBasedRoute allowedRoles={['doctor', 'admin']}>
                 <ConsultPatient />
               </RoleBasedRoute>
             } 
@@ -138,7 +147,7 @@ const AppRoutes = () => {
           <Route 
             path="consultations" 
             element={
-              <RoleBasedRoute allowedRoles={['doctor']}>
+              <RoleBasedRoute allowedRoles={['doctor', 'admin']}>
                 <ConsultationHistory />
               </RoleBasedRoute>
             } 
@@ -151,7 +160,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <ReceptionistHome />
               </RoleBasedRoute>
             }
@@ -161,7 +170,7 @@ const AppRoutes = () => {
           <Route 
             path="patients" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <Patients />
               </RoleBasedRoute>
             } 
@@ -169,7 +178,7 @@ const AppRoutes = () => {
           <Route 
             path="patients/add" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <AddPatient />
               </RoleBasedRoute>
             } 
@@ -177,7 +186,7 @@ const AppRoutes = () => {
           <Route 
             path="patients/edit/:id" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <EditPatient />
               </RoleBasedRoute>
             } 
@@ -185,7 +194,7 @@ const AppRoutes = () => {
           <Route 
             path="patients/view/:id" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <ViewPatient />
               </RoleBasedRoute>
             } 
@@ -195,7 +204,7 @@ const AppRoutes = () => {
           <Route 
             path="appointments" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <Appointments />
               </RoleBasedRoute>
             } 
@@ -203,7 +212,7 @@ const AppRoutes = () => {
           <Route 
             path="appointments/add" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <AddAppointment />
               </RoleBasedRoute>
             } 
@@ -213,7 +222,7 @@ const AppRoutes = () => {
           <Route 
             path="billing" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <Billing />
               </RoleBasedRoute>
             } 
@@ -221,7 +230,7 @@ const AppRoutes = () => {
           <Route 
             path="billing/add" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <GenerateBill />
               </RoleBasedRoute>
             } 
@@ -229,11 +238,12 @@ const AppRoutes = () => {
           <Route 
             path="billing/view/:id" 
             element={
-              <RoleBasedRoute allowedRoles={['receptionist']}>
+              <RoleBasedRoute allowedRoles={['receptionist', 'admin']}>
                 <ViewBill />
               </RoleBasedRoute>
             } 
           />
+
         </Route>
 
         {/* Lab Technician Routes */}
@@ -241,7 +251,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['labtechnician']}>
+              <RoleBasedRoute allowedRoles={['labtechnician', 'admin']}>
                 <LabHome />
               </RoleBasedRoute>
             }
@@ -249,8 +259,32 @@ const AppRoutes = () => {
           <Route
             path='testlist'
             element={
-              <RoleBasedRoute allowedRoles={['labtechnician']}>
+              <RoleBasedRoute allowedRoles={['labtechnician', 'admin']}>
                 <TestList/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='test-requests'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician', 'admin']}>
+                <TestRequests/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='test-results'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician', 'admin']}>
+                <TestResult/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='test-billing'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician', 'admin']}>
+                <TestBill/>
               </RoleBasedRoute>
             }
           />
@@ -261,7 +295,7 @@ const AppRoutes = () => {
           <Route
             index
             element={
-              <RoleBasedRoute allowedRoles={['pharmacist']}>
+              <RoleBasedRoute allowedRoles={['pharmacist', 'admin']}>
                 <PharmacyHome />
               </RoleBasedRoute>
             }

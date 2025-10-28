@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API URL from environment
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/reception';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/';
 
 // Create axios instance
 const api = axios.create({
@@ -11,68 +11,52 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-// Request interceptor - Log what we're sending
+const BASE_URL = API_URL;
+// Request Interceptor — Add access token
 api.interceptors.request.use(
   (config) => {
-    console.log('🚀 API Request:', {
-      method: config.method.toUpperCase(),
-      url: config.url,
-      baseURL: config.baseURL,
-      fullURL: `${config.baseURL}${config.url}`,
-      data: config.data,
-      headers: config.headers
-    });
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
     return config;
   },
-  (error) => {
-    console.error('❌ Request Error:', error);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor - Handle errors with detailed info
+// Response Interceptor — Handle token refresh
 api.interceptors.response.use(
-  (response) => {
-    console.log('✅ API Response:', {
-      status: response.status,
-      statusText: response.statusText,
-      data: response.data
-    });
-    return response;
-  },
-  (error) => {
-    // Handle network errors
-    if (!error.response) {
-      console.error('❌ Network Error:', error.message);
-      return Promise.reject({
-        message: 'Network error. Please check your connection and ensure Django server is running.',
-        originalError: error
-      });
-    }
-    
-    // Log detailed error for debugging
-    console.error('❌ API Error Details:', {
-      status: error.response.status,
-      statusText: error.response.statusText,
-      data: error.response.data,
-      headers: error.response.headers,
-      config: {
-        method: error.config.method,
-        url: error.config.url,
-        data: error.config.data
-      }
-    });
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    // If token expired and not retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-    // Handle specific error codes
-    if (error.response.status === 400) {
-      console.error('🔴 400 Bad Request - Validation Error:', error.response.data);
-    } else if (error.response.status === 404) {
-      console.error('🔴 404 Not Found - Endpoint does not exist');
-    } else if (error.response.status === 500) {
-      console.error('🔴 500 Server Error - Django backend error');
+      try {
+        const refreshToken = localStorage.getItem("refresh_token");
+        const response = await axios.post(`${BASE_URL}token/refresh/`, {
+          refresh: refreshToken,
+        });
+
+        const newAccessToken = response.data.access;
+        localStorage.setItem("access_token", newAccessToken);
+
+        // Update header and retry request
+        api.defaults.headers[
+          "Authorization"
+        ] = `Bearer ${newAccessToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        window.location.href = "/login"; // Redirect to login
+      }
     }
-    
+
     return Promise.reject(error);
   }
 );

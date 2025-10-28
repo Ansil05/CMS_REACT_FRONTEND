@@ -30,10 +30,13 @@ const LoginContainer = () => {
       const accessToken = response.data.tokens.access;
       const refreshToken = response.data.tokens.refresh;
       const role = response.data.role;
+      const email = response.data.email;
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("role",role);
+      localStorage.setItem("role", role);
+      localStorage.setItem("email", email);
+
 
       console.log(localStorage);
 

@@ -1,270 +1,277 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Button, Modal, Row, Col } from 'react-bootstrap';
-import { FaEye, FaTrash, FaFileAlt } from 'react-icons/fa';
-import { getConsultations, deleteConsultation } from '../../services/doctorService';
-import Table from '../../ui/Table';
+import { FaSearch, FaCalendarAlt, FaSort, FaUser, FaPhone, FaStethoscope, FaClock } from 'react-icons/fa';
+import { getConsultations } from '../../services/doctorService';
 import LoadingSpinner from '../../ui/LoadingSpinner';
-import EmptyState from '../../ui/EmptyState';
-import Alert from '../../ui/Alert';
-import ConfirmModal from '../../ui/ConfirmModal';
+import { formatDate } from '../../utils/validations';
+
+function getAge(dob) {
+  if (!dob) return '';
+  const birth = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
 
 const ConsultationHistory = () => {
   const [consultations, setConsultations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedConsultation, setSelectedConsultation] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
+  const [searchPatient, setSearchPatient] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
 
   useEffect(() => {
+    const fetchConsultations = async () => {
+      setLoading(true);
+      try {
+        const data = await getConsultations();
+        setConsultations(data);
+      } catch (err) {
+        // handle error gracefully
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchConsultations();
   }, []);
 
-  const fetchConsultations = async () => {
-    try {
-      setLoading(true);
-      const data = await getConsultations();
-      setConsultations(data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch consultations');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter and sort consultations
+  const filteredAndSortedConsultations = consultations
+    .filter((consult) => {
+      const patientName = consult.appointment?.patient
+        ? `${consult.appointment.patient.first_name} ${consult.appointment.patient.last_name}`.toLowerCase()
+        : '';
+      const appointmentDate = consult.appointment?.appointment_date || '';
 
-  const handleViewDetails = (consultation) => {
-    setSelectedConsultation(consultation);
-    setShowDetailModal(true);
-  };
+      const matchesPatient = patientName.includes(searchPatient.toLowerCase());
+      const matchesDate = searchDate ? appointmentDate === searchDate : true;
 
-  const handleDeleteClick = (consultationId) => {
-    setDeletingId(consultationId);
-    setShowDeleteModal(true);
-  };
+      return matchesPatient && matchesDate;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.appointment?.appointment_date || 0);
+      const dateB = new Date(b.appointment?.appointment_date || 0);
 
-  const handleDeleteConfirm = async () => {
-    try {
-      await deleteConsultation(deletingId);
-      setSuccess('Consultation deleted successfully');
-      fetchConsultations();
-      setShowDeleteModal(false);
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      setError('Failed to delete consultation');
-      console.error(err);
-    }
-  };
+      if (sortOrder === 'newest') {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
 
-  const columns = [
-    {
-      header: 'Consultation ID',
-      accessor: 'consultation_id',
-      render: (value) => `#${value}`,
-    },
-    {
-      header: 'Patient Name',
-      accessor: 'patient_name',
-    },
-    {
-      header: 'Age',
-      accessor: 'patient_age',
-    },
-    {
-      header: 'Date',
-      accessor: 'appointment_date',
-    },
-    {
-      header: 'Diagnosis',
-      accessor: 'diagnosis',
-      render: (value) => (
-        <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {value}
-        </div>
-      ),
-    },
-    {
-      header: 'Actions',
-      accessor: 'consultation_id',
-      render: (value, row) => (
-        <div className="d-flex gap-2">
-          <Button
-            size="sm"
-            variant="info"
-            onClick={() => handleViewDetails(row)}
-            style={{ borderRadius: '6px' }}
-          >
-            <FaEye />
-          </Button>
-          <Button
-            size="sm"
-            variant="danger"
-            onClick={() => handleDeleteClick(value)}
-            style={{ borderRadius: '6px' }}
-          >
-            <FaTrash />
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <LoadingSpinner fullScreen message="Loading consultation history..." />;
 
   return (
-    <Container fluid className="p-4">
-      <Card
-        style={{
-          border: 'none',
-          borderRadius: '15px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        }}
-      >
-        <Card.Body className="p-4">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h4 style={{ fontWeight: '600', color: '#2c3e50', marginBottom: '5px' }}>
-                <FaFileAlt className="me-2" />
-                Consultation History
-              </h4>
-              <p style={{ color: '#7f8c8d', marginBottom: 0, fontSize: '0.9rem' }}>
-                View your previous patient consultations
-              </p>
+    <div className="container p-4">
+      {/* Header Section */}
+      <div className="mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 style={{ fontWeight: 600, color: '#2c3e50', marginBottom: '0.5rem' }}>
+              Consultation History
+            </h2>
+            <p style={{ color: '#7f8c8d', marginBottom: 0, fontSize: '0.95rem' }}>
+              View and manage all your past consultations
+            </p>
+          </div>
+          <div className="badge bg-primary" style={{ fontSize: '1rem', padding: '10px 20px', borderRadius: '20px' }}>
+            {filteredAndSortedConsultations.length} {filteredAndSortedConsultations.length === 1 ? 'Consultation' : 'Consultations'}
+          </div>
+        </div>
+      </div>
+
+      {/* Search and Filter Controls */}
+      <div className="card mb-4" style={{ border: 'none', borderRadius: 15, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+        <div className="card-body p-4">
+          <div className="row g-3">
+            <div className="col-md-4">
+              <label className="form-label" style={{ color: '#2c3e50', fontWeight: 500, marginBottom: '0.5rem' }}>
+                <FaSearch className="me-2" style={{ color: '#7f8c8d' }} />
+                Search Patient
+              </label>
+              <div className="input-group">
+                <span className="input-group-text" style={{ background: '#f8f9fa', borderRight: 'none' }}>
+                  <FaUser style={{ color: '#7f8c8d' }} />
+                </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  style={{ borderLeft: 'none', borderRadius: '8px' }}
+                  placeholder="Enter patient name..."
+                  value={searchPatient}
+                  onChange={(e) => setSearchPatient(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="col-md-4">
+              <label className="form-label" style={{ color: '#2c3e50', fontWeight: 500, marginBottom: '0.5rem' }}>
+                <FaCalendarAlt className="me-2" style={{ color: '#7f8c8d' }} />
+                Filter by Date
+              </label>
+              <div className="input-group">
+                <span className="input-group-text" style={{ background: '#f8f9fa', borderRight: 'none' }}>
+                  <FaCalendarAlt style={{ color: '#7f8c8d' }} />
+                </span>
+                <input
+                  type="date"
+                  className="form-control"
+                  style={{ borderLeft: 'none', borderRadius: '8px' }}
+                  value={searchDate}
+                  onChange={(e) => setSearchDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="col-md-4">
+              <label className="form-label" style={{ color: '#2c3e50', fontWeight: 500, marginBottom: '0.5rem' }}>
+                <FaSort className="me-2" style={{ color: '#7f8c8d' }} />
+                Sort Order
+              </label>
+              <div className="input-group">
+                <span className="input-group-text" style={{ background: '#f8f9fa', borderRight: 'none' }}>
+                  <FaSort style={{ color: '#7f8c8d' }} />
+                </span>
+                <select
+                  className="form-select"
+                  style={{ borderLeft: 'none', borderRadius: '8px' }}
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {error && <Alert type="danger" message={error} onClose={() => setError(null)} />}
-          {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
+      {/* Consultations List */}
+      {filteredAndSortedConsultations.length === 0 ? (
+        <div className="card" style={{ border: 'none', borderRadius: 15, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+          <div className="card-body text-center p-5">
+            <FaStethoscope size={64} style={{ color: '#bdc3c7', marginBottom: '1rem' }} />
+            <h5 style={{ color: '#2c3e50', fontWeight: 600, marginBottom: '0.5rem' }}>
+              No Consultations Found
+            </h5>
+            <p style={{ color: '#7f8c8d', marginBottom: 0 }}>
+              {searchPatient || searchDate 
+                ? 'Try adjusting your search filters to find consultations.'
+                : 'Your consultation history will appear here once consultations are completed.'}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="row g-4">
+          {filteredAndSortedConsultations.map((consult) => {
+            const patientName = consult.appointment?.patient
+              ? `${consult.appointment.patient.first_name} ${consult.appointment.patient.last_name}`
+              : 'N/A';
+            const patientAge = consult.appointment?.patient?.dob
+              ? getAge(consult.appointment.patient.dob)
+              : 'N/A';
+            const phoneNumber = consult.appointment?.patient?.phone_no || 'N/A';
+            const appointmentDate = consult.appointment?.appointment_date || 'N/A';
+            const diagnosis = consult.diagnosis || 'No diagnosis recorded';
 
-          {consultations.length === 0 ? (
-            <EmptyState
-              icon={FaFileAlt}
-              title="No Consultations Found"
-              message="You haven't completed any consultations yet."
-            />
-          ) : (
-            <Table columns={columns} data={consultations} />
-          )}
-        </Card.Body>
-      </Card>
-
-      {/* Detail Modal */}
-      <Modal
-        show={showDetailModal}
-        onHide={() => setShowDetailModal(false)}
-        size="lg"
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Consultation Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedConsultation && (
-            <>
-              <Card className="mb-3" style={{ background: '#f8f9fa', border: 'none' }}>
-                <Card.Body>
-                  <h6 className="mb-3" style={{ fontWeight: '600' }}>
-                    Patient Information
-                  </h6>
-                  <Row>
-                    <Col md={6}>
-                      <p>
-                        <strong>Name:</strong> {selectedConsultation.patient_name}
+            return (
+              <div key={consult.consultation_id} className="col-md-6 col-lg-4">
+                <div 
+                  className="card h-100" 
+                  style={{ 
+                    border: 'none', 
+                    borderRadius: 15, 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  }}
+                >
+                  <div 
+                    className="card-body p-4"
+                    style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      borderRadius: '15px 15px 0 0',
+                      color: 'white'
+                    }}
+                  >
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <h5 className="mb-1" style={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                          {patientName}
+                        </h5>
+                        <div className="d-flex align-items-center" style={{ fontSize: '0.85rem', opacity: 0.9 }}>
+                          <FaClock className="me-2" />
+                          {appointmentDate ? formatDate(appointmentDate) : 'N/A'}
+                        </div>
+                      </div>
+                      <div 
+                        className="rounded-circle d-flex align-items-center justify-content-center"
+                        style={{
+                          width: '50px',
+                          height: '50px',
+                          background: 'rgba(255, 255, 255, 0.2)',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                      >
+                        <FaUser size={24} />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="card-body p-4">
+                    <div className="mb-3">
+                      <div className="d-flex align-items-center mb-2" style={{ color: '#7f8c8d' }}>
+                        <FaUser className="me-2" style={{ color: '#3498db', fontSize: '0.9rem' }} />
+                        <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Age</span>
+                      </div>
+                      <p style={{ color: '#2c3e50', marginLeft: '1.75rem', marginBottom: 0, fontWeight: 600 }}>
+                        {patientAge} {patientAge !== 'N/A' && 'years'}
                       </p>
-                      <p>
-                        <strong>Age:</strong> {selectedConsultation.patient_age} years
+                    </div>
+
+                    <div className="mb-3">
+                      <div className="d-flex align-items-center mb-2" style={{ color: '#7f8c8d' }}>
+                        <FaPhone className="me-2" style={{ color: '#2ecc71', fontSize: '0.9rem' }} />
+                        <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Phone</span>
+                      </div>
+                      <p style={{ color: '#2c3e50', marginLeft: '1.75rem', marginBottom: 0, fontWeight: 600 }}>
+                        {phoneNumber}
                       </p>
-                    </Col>
-                    <Col md={6}>
-                      <p>
-                        <strong>Phone:</strong> {selectedConsultation.patient_phone}
+                    </div>
+
+                    <div className="border-top pt-3">
+                      <div className="d-flex align-items-center mb-2" style={{ color: '#7f8c8d' }}>
+                        <FaStethoscope className="me-2" style={{ color: '#9b59b6', fontSize: '0.9rem' }} />
+                        <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Diagnosis</span>
+                      </div>
+                      <p 
+                        style={{ 
+                          color: '#2c3e50', 
+                          marginLeft: '1.75rem', 
+                          marginBottom: 0,
+                          fontWeight: 500,
+                          lineHeight: '1.5'
+                        }}
+                      >
+                        {diagnosis.length > 60 ? `${diagnosis.substring(0, 60)}...` : diagnosis}
                       </p>
-                      <p>
-                        <strong>Date:</strong> {selectedConsultation.appointment_date}
-                      </p>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-
-              <h6 className="mb-2" style={{ fontWeight: '600' }}>
-                Symptoms
-              </h6>
-              <p className="mb-3" style={{ whiteSpace: 'pre-wrap' }}>
-                {selectedConsultation.symptoms}
-              </p>
-
-              {selectedConsultation.notes && (
-                <>
-                  <h6 className="mb-2" style={{ fontWeight: '600' }}>
-                    Notes
-                  </h6>
-                  <p className="mb-3" style={{ whiteSpace: 'pre-wrap' }}>
-                    {selectedConsultation.notes}
-                  </p>
-                </>
-              )}
-
-              <h6 className="mb-2" style={{ fontWeight: '600' }}>
-                Diagnosis
-              </h6>
-              <p className="mb-3" style={{ whiteSpace: 'pre-wrap' }}>
-                {selectedConsultation.diagnosis}
-              </p>
-
-              {selectedConsultation.prescriptions.length > 0 && (
-                <>
-                  <h6 className="mb-2" style={{ fontWeight: '600' }}>
-                    Prescriptions
-                  </h6>
-                  <ul>
-                    {selectedConsultation.prescriptions.map((prescription) => (
-                      <li key={prescription.pid}>
-                        <strong>{prescription.medicine}</strong> - {prescription.dosage}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-
-              {selectedConsultation.lab_prescriptions.length > 0 && (
-                <>
-                  <h6 className="mb-2" style={{ fontWeight: '600' }}>
-                    Lab Tests
-                  </h6>
-                  <ul>
-                    {selectedConsultation.lab_prescriptions.map((labTest) => (
-                      <li key={labTest.lab_pid}>{labTest.testname}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmModal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Consultation"
-        message="Are you sure you want to delete this consultation? This action cannot be undone."
-        confirmText="Delete"
-        confirmVariant="danger"
-      />
-    </Container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };
 
