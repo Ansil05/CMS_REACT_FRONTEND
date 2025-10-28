@@ -1,21 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Form, Badge, Modal, Alert } from 'react-bootstrap';
+<<<<<<< HEAD
 import { FaPills, FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from 'react-icons/fa';
 import { API_BASE } from '../../config/apiConfig';
 
 const MedicineList = () => {
+=======
+import { FaPills, FaPlus, FaEdit, FaTrash, FaSearch, FaFilter, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../../config/apiConfig';
+
+const MedicineList = () => {
+  const navigate = useNavigate();
+  
+>>>>>>> achu
   // State Management
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+<<<<<<< HEAD
   const [filterStatus, setFilterStatus] = useState('all'); // all, low_stock, expiring, expired
+=======
+  const [filterStatus, setFilterStatus] = useState('all');
+>>>>>>> achu
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
 
+<<<<<<< HEAD
   // Form state for Add/Edit
+=======
+  // Form state
+>>>>>>> achu
   const [formData, setFormData] = useState({
     med_code: '',
     name: '',
@@ -25,16 +43,27 @@ const MedicineList = () => {
     expiry_date: ''
   });
 
+<<<<<<< HEAD
   // Fetch medicines on component mount
+=======
+>>>>>>> achu
   useEffect(() => {
     fetchMedicines();
   }, []);
 
+<<<<<<< HEAD
   // API Call: Fetch all medicines
   const fetchMedicines = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+=======
+  // Fetch medicines
+  const fetchMedicines = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+>>>>>>> achu
       
       const response = await fetch(`${API_BASE}/pharmacy/medicines/`, {
         method: 'GET',
@@ -47,7 +76,11 @@ const MedicineList = () => {
       if (!response.ok) throw new Error('Failed to fetch medicines');
       
       const data = await response.json();
+<<<<<<< HEAD
       setMedicines(data.results || data); // Handle both paginated and non-paginated responses
+=======
+      setMedicines(data.results || data);
+>>>>>>> achu
       setLoading(false);
     } catch (error) {
       console.error('Error fetching medicines:', error);
@@ -56,12 +89,20 @@ const MedicineList = () => {
     }
   };
 
+<<<<<<< HEAD
   // API Call: Add new medicine
+=======
+  // Add medicine
+>>>>>>> achu
   const handleAddMedicine = async (e) => {
     e.preventDefault();
     
     try {
+<<<<<<< HEAD
       const token = localStorage.getItem('token');
+=======
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+>>>>>>> achu
       
       const response = await fetch(`${API_BASE}/pharmacy/medicines/`, {
         method: 'POST',
@@ -80,19 +121,31 @@ const MedicineList = () => {
       showAlert('Medicine added successfully!', 'success');
       setShowAddModal(false);
       resetForm();
+<<<<<<< HEAD
       fetchMedicines(); // Refresh the list
+=======
+      fetchMedicines();
+>>>>>>> achu
     } catch (error) {
       console.error('Error adding medicine:', error);
       showAlert(error.message, 'danger');
     }
   };
 
+<<<<<<< HEAD
   // API Call: Update medicine
+=======
+  // Update medicine
+>>>>>>> achu
   const handleUpdateMedicine = async (e) => {
     e.preventDefault();
     
     try {
+<<<<<<< HEAD
       const token = localStorage.getItem('token');
+=======
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+>>>>>>> achu
       
       const response = await fetch(`${API_BASE}/pharmacy/medicines/${selectedMedicine.med_id}/`, {
         method: 'PUT',
@@ -111,13 +164,18 @@ const MedicineList = () => {
       showAlert('Medicine updated successfully!', 'success');
       setShowEditModal(false);
       resetForm();
+<<<<<<< HEAD
       fetchMedicines(); // Refresh the list
+=======
+      fetchMedicines();
+>>>>>>> achu
     } catch (error) {
       console.error('Error updating medicine:', error);
       showAlert(error.message, 'danger');
     }
   };
 
+<<<<<<< HEAD
   // API Call: Delete medicine
   const handleDeleteMedicine = async () => {
     try {
@@ -147,12 +205,59 @@ const MedicineList = () => {
   };
 
   // Helper: Show alert message
+=======
+ // Delete medicine
+      const handleDeleteMedicine = async () => {
+        try {
+          const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+          
+          const response = await fetch(`${API_BASE}/pharmacy/medicines/${selectedMedicine.med_id}/`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
+
+          if (!response.ok) {
+            let errorMessage = 'Failed to delete medicine';
+            try {
+              const errorData = await response.json();
+              // DRF ValidationError returns errors in various formats
+              errorMessage = errorData.detail || 
+                            errorData.message || 
+                            (errorData.non_field_errors && errorData.non_field_errors[0]) ||
+                            (typeof errorData === 'string' ? errorData : JSON.stringify(errorData)) ||
+                            errorMessage;
+            } catch (parseError) {
+              // If response is not JSON, use default message
+              console.error('Could not parse error response:', parseError);
+            }
+            throw new Error(errorMessage);
+          }
+
+          showAlert('Medicine deleted successfully!', 'success');
+          setShowDeleteModal(false);
+          setSelectedMedicine(null);
+          fetchMedicines();
+        } catch (error) {
+          console.error('Error deleting medicine:', error);
+          showAlert(error.message, 'danger');
+        }
+      };
+
+
+  // Helper functions
+>>>>>>> achu
   const showAlert = (message, type) => {
     setAlert({ show: true, message, type });
     setTimeout(() => setAlert({ show: false, message: '', type: '' }), 5000);
   };
 
+<<<<<<< HEAD
   // Helper: Reset form
+=======
+>>>>>>> achu
   const resetForm = () => {
     setFormData({
       med_code: '',
@@ -164,7 +269,10 @@ const MedicineList = () => {
     });
   };
 
+<<<<<<< HEAD
   // Helper: Open Edit Modal with selected medicine data
+=======
+>>>>>>> achu
   const openEditModal = (medicine) => {
     setSelectedMedicine(medicine);
     setFormData({
@@ -178,13 +286,19 @@ const MedicineList = () => {
     setShowEditModal(true);
   };
 
+<<<<<<< HEAD
   // Helper: Open Delete Modal
+=======
+>>>>>>> achu
   const openDeleteModal = (medicine) => {
     setSelectedMedicine(medicine);
     setShowDeleteModal(true);
   };
 
+<<<<<<< HEAD
   // Helper: Get stock status badge
+=======
+>>>>>>> achu
   const getStockBadge = (medicine) => {
     const today = new Date();
     const expiryDate = new Date(medicine.expiry_date);
@@ -203,7 +317,11 @@ const MedicineList = () => {
     }
   };
 
+<<<<<<< HEAD
   // Filter medicines based on search and filter status
+=======
+  // Filter medicines
+>>>>>>> achu
   const filteredMedicines = medicines.filter(medicine => {
     const matchesSearch = 
       medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -223,7 +341,10 @@ const MedicineList = () => {
     return matchesSearch;
   });
 
+<<<<<<< HEAD
   // Loading State
+=======
+>>>>>>> achu
   if (loading) {
     return (
       <Container fluid className="p-4">
@@ -269,6 +390,20 @@ const MedicineList = () => {
         </Alert>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* Back Button */}
+      <Button 
+        variant="outline-secondary"
+        onClick={() => navigate('/app/pharmacist')}
+        className="mb-3"
+        style={{ borderRadius: '8px' }}
+      >
+        <FaArrowLeft className="me-2" />
+        Back to Dashboard
+      </Button>
+
+>>>>>>> achu
       {/* Search and Filter */}
       <Card className="mb-4" style={{ border: 'none', borderRadius: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
         <Card.Body>

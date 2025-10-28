@@ -8,7 +8,12 @@ import {
   FaBoxes,
   FaFileInvoiceDollar,
   FaShoppingCart,
+<<<<<<< HEAD
   FaWarehouse
+=======
+  FaWarehouse,
+  FaClipboardList
+>>>>>>> achu
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE } from '../../config/apiConfig';
@@ -35,10 +40,15 @@ const PharmacyDashboard = () => {
     try {
       setLoading(true);
       
+<<<<<<< HEAD
       // Get JWT token from localStorage
       const token = localStorage.getItem('token');
       
       // Fetch inventory report from your API using your API_BASE config
+=======
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      
+>>>>>>> achu
       const response = await fetch(`${API_BASE}/pharmacy/medicines/inventory_report/`, {
         method: 'GET',
         headers: {
@@ -69,7 +79,10 @@ const PharmacyDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+<<<<<<< HEAD
       // Set default values on error
+=======
+>>>>>>> achu
       setStats({
         totalMedicines: 0,
         totalStock: 0,
@@ -254,7 +267,11 @@ const PharmacyDashboard = () => {
           >
             <Card.Body className="p-4">
               <div className="d-flex align-items-center mb-3">
+<<<<<<< HEAD
                 <FaShoppingCart size={24} color="#2ecc71" className="me-2" />
+=======
+                <FaClipboardList size={24} color="#2ecc71" className="me-2" />
+>>>>>>> achu
                 <h5 className="mb-0" style={{ fontWeight: '600', color: '#2c3e50' }}>
                   Orders
                 </h5>
@@ -263,14 +280,21 @@ const PharmacyDashboard = () => {
                 Manage medicine orders and prescriptions
               </p>
               <Button
+<<<<<<< HEAD
                 variant="primary"
+=======
+                variant="success"
+>>>>>>> achu
                 onClick={() => navigate('/app/pharmacist/orders')}
                 style={{
                   borderRadius: '8px',
                   padding: '10px 24px',
                   fontWeight: '500',
+<<<<<<< HEAD
                   background: '#2ecc71',
                   border: 'none',
+=======
+>>>>>>> achu
                 }}
               >
                 View Orders
@@ -299,14 +323,22 @@ const PharmacyDashboard = () => {
                 Check stock levels and manage inventory
               </p>
               <Button
+<<<<<<< HEAD
                 variant="primary"
                 onClick={() => navigate('/app/pharmacist/inventory')}
+=======
+                variant="warning"
+                onClick={() => navigate('/app/pharmacist/medicines')}
+>>>>>>> achu
                 style={{
                   borderRadius: '8px',
                   padding: '10px 24px',
                   fontWeight: '500',
+<<<<<<< HEAD
                   background: '#e67e22',
                   border: 'none',
+=======
+>>>>>>> achu
                 }}
               >
                 View Inventory

@@ -32,17 +32,21 @@ const LoginContainer = () => {
       const role = response.data.role;
       const email = response.data.email;
 
+      // Store tokens and role
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("role", role);
       localStorage.setItem("email", email);
 
 
-      console.log(localStorage);
+      console.log("Login successful, role:", role);
+      console.log("LocalStorage:", localStorage);
 
+      // Update context
       login();
       setRole(role);
     } catch (err) {
+      console.error("Login error:", err);
       if (err.response && err.response.status === 401) {
         setError("Invalid username or password");
       } else {

@@ -17,6 +17,15 @@ import NotFound from '../pages/NotFound';
 import AdminHome from '../pages/Admin/AdminHome';
 import StaffListPage from '../pages/Admin/StaffListPage';
 
+//pharmacist pages
+import MedicineList from '../components/Pharmasist/MedicineList';
+import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
+import PrescriptionOrders from '../components/Pharmasist/PrescriptionOrders';
+import PrescriptionList from '../components/Pharmasist/PrescriptionList';
+import ConsultationList from '../components/Pharmasist/ConsultationList';
+import BillsList from '../components/Pharmasist/BillsList';
+
+
 // Doctor Pages
 import DoctorHome from '../pages/Doctor/DoctorHome';
 import ViewAppointments from '../pages/Doctor/ViewAppointments';
@@ -42,8 +51,7 @@ import TestBill from '../pages/LabTechnician/TestBill';
 import TestResult from '../pages/LabTechnician/TestResult';
 import TestList from '../pages/LabTechnician/TestList';
 
-// Pharmacist Pages
-import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
+
 
 
 
@@ -291,7 +299,9 @@ const AppRoutes = () => {
         </Route>
 
         {/* Pharmacist Routes */}
-        <Route path="pharmacist">
+       
+    
+       <Route path="pharmacist">
           <Route
             index
             element={
@@ -300,7 +310,62 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             }
           />
-          
+          {/* Add this new route */}
+          <Route
+            path="medicines"
+            element={
+              <RoleBasedRoute allowedRoles={['pharmacist']}>
+                <MedicineList />
+              </RoleBasedRoute>
+            }
+          />
+            {/* Orders - Prescription Orders */}
+            <Route
+              path="orders"
+              element={
+                <RoleBasedRoute allowedRoles={['pharmacist']}>
+                  <PrescriptionOrders />
+                </RoleBasedRoute>
+              }
+            />
+              {/* Bills */}
+            <Route
+              path="bills"
+              element={
+                <RoleBasedRoute allowedRoles={['pharmacist']}>
+                  <BillsList />
+                </RoleBasedRoute>
+              }
+            />
+
+             <Route
+              path="inventory"
+              element={
+                <RoleBasedRoute allowedRoles={['pharmacist']}>
+                  <MedicineList />
+                </RoleBasedRoute>
+              }
+            />
+             {/* Optional: Prescription List (if you want separate from orders) */}
+              <Route
+                path="prescriptions"
+                element={
+                  <RoleBasedRoute allowedRoles={['pharmacist']}>
+                    <PrescriptionList />
+                  </RoleBasedRoute>
+                }
+              />
+              
+              {/* Optional: Consultation List */}
+              <Route
+                path="consultations"
+                element={
+                  <RoleBasedRoute allowedRoles={['pharmacist']}>
+                    <ConsultationList />
+                  </RoleBasedRoute>
+                }
+              />
+            
         </Route>
       </Route>
 
