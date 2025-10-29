@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRole } from '../context/RoleContext';
+import Reports from '../components/LabTechnician/Reports';
+
 
 
 // Layouts
@@ -304,6 +306,14 @@ const AppRoutes = () => {
             element={
               <RoleBasedRoute allowedRoles={['labtechnician', 'admin']}>
                 <TestBill/>
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path='reports'
+            element={
+              <RoleBasedRoute allowedRoles={['labtechnician']}>
+                <Reports/>
               </RoleBasedRoute>
             }
           />

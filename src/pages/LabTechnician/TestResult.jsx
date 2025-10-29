@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../../styles/forms.css"; // ✅ Make sure the path is correct
 
 const TestResult = () => {
   const [formData, setFormData] = useState({
@@ -7,8 +8,8 @@ const TestResult = () => {
     age: "",
     testName: "",
     date: "",
-    testRate: "",
-    totalAmount: "",
+    testResult: "",
+    remarks: "",
   });
 
   const handleChange = (e) => {
@@ -16,132 +17,155 @@ const TestResult = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handlePayment = (type) => {
-    alert(`${type} selected!`);
+  const handleSave = (e) => {
+    e.preventDefault();
+    alert("✅ Test Result Saved Successfully!");
+    console.log("Saved Data:", formData);
   };
 
-  const handleGeneratePrint = () => {
+  const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-center">Lab Test Result</h2>
-      <form className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Patient ID
-            </label>
+    <div className="form-container max-w-4xl mx-auto mt-10">
+      <h2
+        className="text-3xl font-bold mb-8 text-center"
+        style={{ color: "var(--primary-700)" }}
+      >
+        🧪 Lab Test Result Entry
+      </h2>
+
+      <form onSubmit={handleSave}>
+        {/* Row 1 - Patient ID & Name */}
+        <div className="form-row form-row-2">
+          <div className="form-group">
+            <label className="form-label form-label-required">Patient ID</label>
             <input
               type="text"
               name="patientId"
               value={formData.patientId}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded"
               placeholder="Enter Patient ID"
+              className="form-control"
+              required
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Name</label>
+
+          <div className="form-group">
+            <label className="form-label form-label-required">Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded"
-              placeholder="Enter Name"
+              placeholder="Enter Patient Name"
+              className="form-control"
+              required
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Age</label>
+        </div>
+
+        {/* Row 2 - Age & Test Name */}
+        <div className="form-row form-row-2">
+          <div className="form-group">
+            <label className="form-label form-label-required">Age</label>
             <input
               type="number"
               name="age"
               value={formData.age}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded"
               placeholder="Enter Age"
+              className="form-control"
+              required
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Test Name
-            </label>
+
+          <div className="form-group">
+            <label className="form-label form-label-required">Test Name</label>
             <input
               type="text"
               name="testName"
               value={formData.testName}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded"
               placeholder="Enter Test Name"
+              className="form-control"
+              required
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Date</label>
+        </div>
+
+        {/* Row 3 - Date & Test Result */}
+        <div className="form-row form-row-2">
+          <div className="form-group">
+            <label className="form-label form-label-required">Date</label>
             <input
               type="date"
               name="date"
               value={formData.date}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded"
+              className="form-control"
+              required
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Test Rate</label>
+
+          <div className="form-group">
+            <label className="form-label form-label-required">Test Result</label>
             <input
-              type="number"
-              name="testRate"
-              value={formData.testRate}
-              onChange={(e) => {
-                handleChange(e);
-                setFormData({
-                  ...formData,
-                  totalAmount: e.target.value,
-                });
-              }}
-              className="w-full border border-gray-300 p-2 rounded"
-              placeholder="Enter Test Rate"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-gray-700 font-medium mb-1">
-              Total Amount
-            </label>
-            <input
-              type="number"
-              name="totalAmount"
-              value={formData.totalAmount}
-              readOnly
-              className="w-full border border-gray-300 p-2 rounded bg-gray-100"
+              type="text"
+              name="testResult"
+              value={formData.testResult}
+              onChange={handleChange}
+              placeholder="Enter Test Result"
+              className="form-control"
+              required
             />
           </div>
         </div>
 
-        <div className="flex gap-4 mt-4">
-          <button
-            type="button"
-            onClick={() => handlePayment("Insurance")}
-            className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-          >
-            Insurance
-          </button>
-          <button
-            type="button"
-            onClick={() => handlePayment("Pay Now")}
-            className="flex-1 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
-          >
-            Pay Now
-          </button>
+        {/* Remarks */}
+        <div className="form-group">
+          <label className="form-label">Remarks</label>
+          <textarea
+            name="remarks"
+            value={formData.remarks}
+            onChange={handleChange}
+            placeholder="Enter any remarks or notes..."
+            className="form-control form-textarea"
+          ></textarea>
         </div>
 
-        <div className="mt-6 text-center">
+        {/* Buttons */}
+        <div className="form-actions">
+          <button
+            type="submit"
+            className="btn-save"
+            style={{
+              backgroundColor: "green",
+              color: "white",
+              border: "none",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
+          >
+            💾 Save Result
+          </button>
+
           <button
             type="button"
-            onClick={handleGeneratePrint}
-            className="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-900 transition"
+            onClick={handlePrint}
+            className="btn-generate"
+            style={{
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              padding: "0.75rem 1.5rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
           >
-            Generate & Print
+            🖨️ Generate & Print
           </button>
         </div>
       </form>
