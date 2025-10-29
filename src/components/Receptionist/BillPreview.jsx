@@ -3,7 +3,7 @@ import { Card } from 'react-bootstrap';
 import { FaPrint, FaTimes, FaDownload, FaEnvelope, FaCheckCircle } from 'react-icons/fa';
 import Button from '../../elements/Button';
 // import { generateSimpleBillPDF } from '../../utils/pdfGenerator';
-// import { sendBillReceipt, isValidEmail } from '../../services/emailService';
+import { sendBillReceipt, isValidEmail } from '../../services/emailService';
 import { formatDate, formatCurrency } from '../../utils/validations';
 import Alert from '../../ui/Alert';
 import { generateBillPDF } from '../../utils/pdfGenerator';

@@ -8,7 +8,7 @@ import { FaPlus } from "react-icons/fa";
 import { deleteUserByEmail } from "../../services/authService";
 import DoctorTable from "./DoctorTable";
 
-const StaffContainer = () => {
+const StaffContainer = ({ fetchStats }) => {
   const [staffSuccess, setStaffSuccess] = useState("");
   const [credentialsSuccess, setCredentialsSuccess] = useState("");
   const [doctorSuccess, setDoctorSuccess] = useState("");
@@ -95,6 +95,11 @@ const StaffContainer = () => {
       await deleteStaff(id);
       setStaffs(staffs.filter((s) => s.StaffId !== id));
       setDoctors(doctors.filter((d) => d.StaffDetail.StaffId !== id));
+      setStaffSuccess("Staff deleted successfully!");
+      setTimeout(() => {
+        setStaffSuccess("");
+      }, 5000);
+      fetchStats();
     } catch {
       setError("Failed to delete staff");
     }
@@ -143,6 +148,7 @@ const StaffContainer = () => {
           setDoctors([...doctors, doctorDetails]);
         }
         setStaffs([...staffs, newStaff]);
+        fetchStats();
       } else {
         const payload = {
           StaffId: formData.StaffId,
@@ -184,22 +190,21 @@ const StaffContainer = () => {
       {staffSuccess && <Alert variant="success">{staffSuccess}</Alert>}
       {doctorSuccess && <Alert variant="success">{doctorSuccess}</Alert>}
 <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Staff List</h4>
+      <div className="p-3">
+      {/* Header */}
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <h4 className="fw-bold text-success mb-2">Staff List</h4>
         <Button variant="success" onClick={handleAdd}>
           <FaPlus /> Add New Staff
         </Button>
       </div>
+      
 
       <StaffTable staffs={staffs} onEdit={handleEdit} onDelete={handleDelete} />
+        
+      </div>
 </div>
 <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Doctor List</h4>
-        {/* <Button variant="success" onClick={handleAdd}>
-          <FaPlus /> Add New Staff
-        </Button> */}
-      </div>
       <DoctorTable doctors={doctors} onEdit={handleEdit} onDelete={handleDelete} />
 </div>
       <StaffFormModal

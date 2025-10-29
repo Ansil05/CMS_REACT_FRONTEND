@@ -28,6 +28,8 @@ const LoginContainer = () => {
 
       const accessToken = response.data.tokens.access;
       const refreshToken = response.data.tokens.refresh;
+      
+      const email = response.data.email;
 
       // ✅ Normalize the role (case-insensitive fix)
       const role = response.data.role
@@ -38,6 +40,8 @@ const LoginContainer = () => {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("role", role);
+      localStorage.setItem("email", email);
+
 
       console.log("✅ Login Successful | Normalized Role:", role);
 

@@ -45,7 +45,7 @@ const BillReports = () => {
   };
 
   const handleViewBill = (billId) => {
-    navigate(`/app/receptionist/billing/view/${billId}`);
+    navigate(`/app/receptionist/billing/${billId}`);
   };
 
   const getPaymentModeIcon = (mode) => {
