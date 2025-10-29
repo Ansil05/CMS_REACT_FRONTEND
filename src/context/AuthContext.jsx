@@ -15,9 +15,7 @@ export const AuthProvider = ({ children }) => {
     email: localStorage.getItem("email"),
   }));
 
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("accessToken")
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // ✅ Login function (called from LoginContainer)
   const login = async (username, password) => {

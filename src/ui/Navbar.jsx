@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar as BSNavbar, Container, Dropdown } from 'react-bootstrap';
 import { FaBars, FaUser, FaBell, FaSignOutAlt, FaCog, FaMoon, FaSun } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
 import { useRole } from '../context/RoleContext';
 import logo from '../assets/images/logo.png'; // ✅ Import your logo
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
   const navigate = useNavigate();
@@ -22,10 +22,10 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
       admin: 'Administrator',
       doctor: 'Doctor',
       receptionist: 'Receptionist',
-      'lab-technician': 'Lab Technician',
+      labtechnician: 'Lab Technician',
       pharmacist: 'Pharmacist',
     };
-    return roleNames[role] || 'User';
+    return roleNames[user.role] || 'User';
   };
 
   return (

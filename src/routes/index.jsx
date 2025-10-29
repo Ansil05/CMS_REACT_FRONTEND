@@ -67,14 +67,14 @@ import { useEffect } from 'react';
 const AppRoutes = () => {
   const { isAuthenticated,user} = useAuth();
   // const { role } = useRole();
-  console.log("AppRoutes - isAuthenticated:", isAuthenticated, "role:", user.role);
+  // console.log("AppRoutes - isAuthenticated:", isAuthenticated, "role:", user.role||"");
   // Get home route based on role
   const getHomeRoute = () => {
     const routes = {
       admin: '/app/admin',
       doctor: '/app/doctor',
       receptionist: '/app/receptionist',
-      labtechnician: '/app/labtechnician',
+      labtechnician: '/app/lab-technician',
       pharmacist: '/app/pharmacist',
     };
     return routes[user.role] || '/login';

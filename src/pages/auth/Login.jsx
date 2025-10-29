@@ -18,7 +18,7 @@ const Login = () => {
         admin: "/app/admin",
         doctor: "/app/doctor",
         receptionist: "/app/receptionist",
-        labTechnician: "/app/labtechnician",
+        labTechnician: "/app/lab-technician",
         pharmacist: "/app/pharmacist",
       };
       setRole(user.role);
