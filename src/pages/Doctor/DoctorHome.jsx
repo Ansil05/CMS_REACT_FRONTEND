@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaFileAlt, FaUsers, FaChartLine } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FaCalendarAlt, FaFileAlt, FaUsers, FaChartLine, FaSyncAlt } from 'react-icons/fa';
 import { getDoctorAppointments, getConsultations } from '../../services/doctorService';
 import LoadingSpinner from '../../ui/LoadingSpinner';
 
 const DoctorHome = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const isInitialMount = useRef(true);
   const [stats, setStats] = useState({
     totalAppointments: 0,
     todayAppointments: 0,
@@ -14,31 +17,146 @@ const DoctorHome = () => {
     pendingAppointments: 0,
   });
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
+  const fetchDashboardData = useCallback(async (showRefreshing = false) => {
+    try {
+      if (showRefreshing) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
-        const [appointments, consultations] = await Promise.all([
-          getDoctorAppointments(),
-          getConsultations(),
-        ]);
-        const today = new Date().toISOString().split('T')[0];
-        const todayAppointments = appointments.filter(app => app.date === today).length;
-        const pendingAppointments = appointments.filter(app => app.status === 'Scheduled').length;
-        setStats({
-          totalAppointments: appointments.length,
-          todayAppointments,
-          totalConsultations: consultations.length,
-          pendingAppointments,
-        });
-      } catch (error) {
-        // handle error
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchDashboardData();
+      const [appointmentsData, consultationsData] = await Promise.all([
+        getDoctorAppointments(),
+        getConsultations(),
+      ]);
+      
+      // Ensure appointments and consultations are arrays
+      const appointments = Array.isArray(appointmentsData) ? appointmentsData : [];
+      const consultations = Array.isArray(consultationsData) ? consultationsData : [];
+      
+      // Debug: Log appointment data to understand structure
+      if (appointments && appointments.length > 0) {
+        console.log('Sample appointment data:', appointments[0]);
+        console.log('All appointment statuses:', appointments.map(app => app.status));
+        console.log('Pending count calculation:', {
+          total: appointments.length,
+          withStatus: appointments.filter(app => app.status).length,
+          withoutStatus: appointments.filter(app => !app.status).length,
+          completed: appointments.filter(app => (app.status || '').toLowerCase() === 'completed').length,
+          cancelled: appointments.filter(app => (app.status || '').toLowerCase() === 'cancelled').length,
+        });
+      }
+      
+      // Get today's and tomorrow's date in YYYY-MM-DD format (matching ViewAppointments logic)
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      
+      // Handle both appointment_date and date fields
+      const todayAppointments = appointments.filter(app => {
+        const appDate = app.appointment_date || app.date;
+        const dateStr = appDate?.split('T')[0] || appDate;
+        return dateStr === todayStr;
+      }).length;
+      
+      // Count pending appointments: only today's and tomorrow's appointments that are not completed or cancelled
+      const pendingAppointments = appointments.filter(app => {
+        const status = (app.status || '').toLowerCase().trim();
+        
+        // Exclude completed and cancelled appointments
+        if (status && ['completed', 'cancelled'].includes(status)) {
+          return false;
+        }
+        
+        // Only count appointments for today or tomorrow (matching ViewAppointments)
+        const appDate = app.appointment_date || app.date;
+        if (!appDate) return false; // Skip if no date
+        
+        const dateStr = appDate.split('T')[0]; // Get date part only
+        
+        // Only include today or tomorrow's appointments
+        return dateStr === todayStr || dateStr === tomorrowStr;
+      }).length;
+      setStats({
+        totalAppointments: appointments.length,
+        todayAppointments,
+        totalConsultations: consultations.length,
+        pendingAppointments,
+      });
+      
+      // Enhanced debug logging for pending appointments
+      const pendingDetails = appointments.filter(app => {
+        const status = (app.status || '').toLowerCase().trim();
+        if (status && ['completed', 'cancelled'].includes(status)) return false;
+        const appDate = app.appointment_date || app.date;
+        if (!appDate) return false;
+        const dateStr = appDate.split('T')[0];
+        return dateStr === todayStr || dateStr === tomorrowStr;
+      });
+      
+      console.log('Dashboard stats updated:', {
+        totalAppointments: appointments.length,
+        todayAppointments,
+        totalConsultations: consultations.length,
+        pendingAppointments,
+        todayStr,
+        tomorrowStr,
+        pendingDetails: pendingDetails.map(app => ({
+          id: app.appointment_id || app.id,
+          date: app.appointment_date || app.date,
+          status: app.status,
+          patientId: app.patient
+        })),
+        allAppointmentsBreakdown: appointments.map(app => ({
+          id: app.appointment_id || app.id,
+          date: app.appointment_date || app.date,
+          status: app.status,
+          isToday: (app.appointment_date || app.date)?.split('T')[0] === todayStr,
+          isTomorrow: (app.appointment_date || app.date)?.split('T')[0] === tomorrowStr,
+          isPending: !['completed', 'cancelled'].includes((app.status || '').toLowerCase().trim())
+        }))
+      });
+    } catch (error) {
+      // handle error
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+    isInitialMount.current = false;
+  }, [fetchDashboardData]);
+
+  // Refresh when navigating back to this page from another route
+  useEffect(() => {
+    // Skip the initial mount since we already fetch on mount
+    if (isInitialMount.current) return;
+    
+    if (location.pathname === '/app/doctor' || location.pathname === '/app/doctor/') {
+      fetchDashboardData(true);
+    }
+  }, [location.pathname, fetchDashboardData]);
+
+  // Refresh when window gains focus (user returns to tab)
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchDashboardData(true);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchDashboardData]);
+
+  const handleManualRefresh = () => {
+    fetchDashboardData(true);
+  };
 
   const dashboardCards = [
     { title: 'Total Appointments', value: stats.totalAppointments, icon: FaCalendarAlt, color: '#3498db', bgColor: '#ebf5fb' },
@@ -51,7 +169,23 @@ const DoctorHome = () => {
 
   return (
     <div className="container p-4">
-      <h2 className="mb-4" style={{ fontWeight: 600, color: '#2c3e50' }}>Doctor Dashboard</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 style={{ fontWeight: 600, color: '#2c3e50', marginBottom: 0 }}>Doctor Dashboard</h2>
+        <button
+          className="btn btn-outline-primary"
+          onClick={handleManualRefresh}
+          disabled={refreshing || loading}
+          style={{ borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center' }}
+        >
+          <FaSyncAlt 
+            style={{ 
+              marginRight: '8px',
+              animation: refreshing ? 'spin 1s linear infinite' : 'none'
+            }} 
+          />
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
       <div className="row g-4 mb-4">
         {dashboardCards.map((card, idx) => (
           <div key={idx} className="col-xs-12 col-sm-6 col-lg-3">

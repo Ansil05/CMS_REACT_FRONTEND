@@ -1,41 +1,19 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useRole } from '../../context/RoleContext';
-import React, { useState } from "react";
-import { Form, Button, Card, Container, Row, Col, Alert, Spinner } from "react-bootstrap";
-import LoginContainer from '../../components/Auth/LoginContainer';
+import React, { useEffect } from "react";
+import { Container, Row, Col } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useRole } from "../../context/RoleContext";
+import LoginContainer from "../../components/Auth/LoginContainer";
 
 const Login = () => {
-  console.log("Rendering Login component");
-  const { login } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { setRole } = useRole();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ username: "", password: "", role: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleLogin = (e) => {
-    e.preventDefault();
+  // ✅ Redirect if already logged in
+  useEffect(() => {
     
-    if (!formData.username || !formData.password || !formData.role) {
-      setError("All fields are required");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    // Simulate login delay
-    setTimeout(() => {
-      login(formData); // Pass the whole formData
-      setRole(formData.role);
-
-      // Navigate to role-based page
+    if (isAuthenticated && user?.role) {
       const routes = {
         admin: "/app/admin",
         doctor: "/app/doctor",
@@ -43,19 +21,21 @@ const Login = () => {
         labtechnician: "/app/lab-technician",
         pharmacist: "/app/pharmacist",
       };
+      setRole(user.role);
+      navigate(routes[user.role] || "/");
+    }
+  }, [isAuthenticated, user, setRole, navigate]);
 
-      navigate(routes[formData.role] || "/app/receptionist");
-      setLoading(false);
-    }, 800);
-  };
-
-  return (<Container
+  return (
+    
+    <Container
       className="d-flex justify-content-center align-items-center"
       style={{ minHeight: "100vh" }}
     >
       <Row className="w-100">
         <Col md={{ span: 4, offset: 4 }}>
           <h3 className="text-center mb-4">Login</h3>
+          {/* ✅ LoginContainer handles the form and login logic */}
           <LoginContainer />
         </Col>
       </Row>

@@ -4,6 +4,7 @@ import { useRole } from '../context/RoleContext';
 import Reports from '../components/LabTechnician/Reports';
 
 
+
 // Layouts
 import MainLayout from '../ui/MainLayout';
 
@@ -17,6 +18,15 @@ import NotFound from '../pages/NotFound';
 // Admin Pages
 import AdminHome from '../pages/Admin/AdminHome';
 import StaffListPage from '../pages/Admin/StaffListPage';
+
+//pharmacist pages
+import MedicineList from '../components/Pharmasist/MedicineList';
+import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
+import PrescriptionOrders from '../components/Pharmasist/PrescriptionOrders';
+import PrescriptionList from '../components/Pharmasist/PrescriptionList';
+import ConsultationList from '../components/Pharmasist/ConsultationList';
+import BillsList from '../components/Pharmasist/BillsList';
+
 
 // Doctor Pages
 import DoctorHome from '../pages/Doctor/DoctorHome';
@@ -43,8 +53,7 @@ import TestBill from '../pages/LabTechnician/TestBill';
 import TestResult from '../pages/LabTechnician/TestResult';
 import TestList from '../pages/LabTechnician/TestList';
 
-// Pharmacist Pages
-import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
+
 
 
 
@@ -53,24 +62,36 @@ import PharmacyHome from '../pages/Pharmasist/PharmacyHome';
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import PublicLandingPage from '../pages/PublicLandingPage';
+import { useEffect } from 'react';
 
 
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
-  const { role } = useRole();
-
+  const { isAuthenticated,user} = useAuth();
+  // const { role } = useRole();
+  console.log("AppRoutes - isAuthenticated:", isAuthenticated, "role:", user.role);
   // Get home route based on role
   const getHomeRoute = () => {
     const routes = {
       admin: '/app/admin',
       doctor: '/app/doctor',
       receptionist: '/app/receptionist',
-      labtechnician: '/app/lab-technician',
+      labtechnician: '/app/labtechnician',
       pharmacist: '/app/pharmacist',
     };
-    return routes[role] || '/login';
+    return routes[user.role] || '/login';
   };
+  // useEffect(() => {
+  //   const handleStorageChange = () => {
+  //     setIsAuthenticated(!!localStorage.getItem("accessToken"));
+  //   };
+
+  //   window.addEventListener("storage", handleStorageChange);
+  //   return () => {
+  //     window.removeEventListener("storage", handleStorageChange);
+  //   };
+  // }, [setIsAuthenticated]);
+  
 
   return (
     <Routes>
@@ -78,13 +99,12 @@ const AppRoutes = () => {
       <Route 
         path="/login" 
         element={
-          isAuthenticated ? <Navigate to={getHomeRoute()} replace /> : <Login />
-        } 
-      />
-      <Route path='/'
-      element={<PublicLandingPage />}/>
+        <Login />
+        }
+      />  
 
-      
+      <Route path='/' element={<PublicLandingPage />} />
+
       {/* Protected Routes */}
       <Route 
         path="/app" 
@@ -94,8 +114,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        {/* Default redirect to role-specific home */}
-        <Route index element={<Navigate to={getHomeRoute()} replace />} />
+        {/* Default redirect to role-specific home
+        // <Route index element={<Navigate to={getHomeRoute()} replace />} /> */}
 
         {/* Admin Routes */}
         <Route path="admin">
@@ -300,7 +320,9 @@ const AppRoutes = () => {
         </Route>
 
         {/* Pharmacist Routes */}
-        <Route path="pharmacist">
+       
+    
+       <Route path="pharmacist">
           <Route
             index
             element={
@@ -309,7 +331,62 @@ const AppRoutes = () => {
               </RoleBasedRoute>
             }
           />
-          
+          {/* Add this new route */}
+          <Route
+            path="medicines"
+            element={
+              <RoleBasedRoute allowedRoles={['pharmacist']}>
+                <MedicineList />
+              </RoleBasedRoute>
+            }
+          />
+            {/* Orders - Prescription Orders */}
+            <Route
+              path="orders"
+              element={
+                <RoleBasedRoute allowedRoles={['pharmacist']}>
+                  <PrescriptionOrders />
+                </RoleBasedRoute>
+              }
+            />
+              {/* Bills */}
+            <Route
+              path="bills"
+              element={
+                <RoleBasedRoute allowedRoles={['pharmacist']}>
+                  <BillsList />
+                </RoleBasedRoute>
+              }
+            />
+
+             <Route
+              path="inventory"
+              element={
+                <RoleBasedRoute allowedRoles={['pharmacist']}>
+                  <MedicineList />
+                </RoleBasedRoute>
+              }
+            />
+             {/* Optional: Prescription List (if you want separate from orders) */}
+              <Route
+                path="prescriptions"
+                element={
+                  <RoleBasedRoute allowedRoles={['pharmacist']}>
+                    <PrescriptionList />
+                  </RoleBasedRoute>
+                }
+              />
+              
+              {/* Optional: Consultation List */}
+              <Route
+                path="consultations"
+                element={
+                  <RoleBasedRoute allowedRoles={['pharmacist']}>
+                    <ConsultationList />
+                  </RoleBasedRoute>
+                }
+              />
+            
         </Route>
       </Route>
 

@@ -5,16 +5,15 @@ import AppRoutes from './routes';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <RoleProvider>
+    <AuthProvider>
+      <RoleProvider>
+        <BrowserRouter>
           <AppRoutes />
-        </RoleProvider>
-      </AuthProvider>
-    </BrowserRouter>
+        </BrowserRouter>
+      </RoleProvider>
+    </AuthProvider>
   );
 }
 

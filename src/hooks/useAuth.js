@@ -1,11 +1,8 @@
-import { useState, useEffect } from 'react';
+// import { useContext } from "react";
+// import AuthContext from "../context/AuthContext";
 
-export default function useAuth() {
-  const [user, setUser] = useState(null);
+// const useAuth = () => {
+//   return useContext(AuthContext);
+// };
 
-  useEffect(() => {
-    // TODO: initialize auth from context/localStorage
-  }, []);
-
-  return { user, setUser };
-}
+// export default useAuth;
