@@ -60,24 +60,36 @@ import TestList from '../pages/LabTechnician/TestList';
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import PublicLandingPage from '../pages/PublicLandingPage';
+import { useEffect } from 'react';
 
 
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
-  const { role } = useRole();
-
+  const { isAuthenticated,user} = useAuth();
+  // const { role } = useRole();
+  console.log("AppRoutes - isAuthenticated:", isAuthenticated, "role:", user.role);
   // Get home route based on role
   const getHomeRoute = () => {
     const routes = {
       admin: '/app/admin',
       doctor: '/app/doctor',
       receptionist: '/app/receptionist',
-      labtechnician: '/app/lab-technician',
+      labtechnician: '/app/labtechnician',
       pharmacist: '/app/pharmacist',
     };
-    return routes[role] || '/login';
+    return routes[user.role] || '/login';
   };
+  // useEffect(() => {
+  //   const handleStorageChange = () => {
+  //     setIsAuthenticated(!!localStorage.getItem("accessToken"));
+  //   };
+
+  //   window.addEventListener("storage", handleStorageChange);
+  //   return () => {
+  //     window.removeEventListener("storage", handleStorageChange);
+  //   };
+  // }, [setIsAuthenticated]);
+  
 
   return (
     <Routes>
@@ -85,13 +97,12 @@ const AppRoutes = () => {
       <Route 
         path="/login" 
         element={
-          isAuthenticated ? <Navigate to={getHomeRoute()} replace /> : <Login />
-        } 
-      />
-      <Route path='/'
-      element={<PublicLandingPage />}/>
+        <Login />
+        }
+      />  
 
-      
+      <Route path='/' element={<PublicLandingPage />} />
+
       {/* Protected Routes */}
       <Route 
         path="/app" 
@@ -101,8 +112,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        {/* Default redirect to role-specific home */}
-        <Route index element={<Navigate to={getHomeRoute()} replace />} />
+        {/* Default redirect to role-specific home
+        // <Route index element={<Navigate to={getHomeRoute()} replace />} /> */}
 
         {/* Admin Routes */}
         <Route path="admin">

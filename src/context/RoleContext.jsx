@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState } from 'react';
 
-const RoleContext = createContext();
+const RoleContext = createContext({
+  role: '',
+  setRole: () => {},
+});
 
-export function RoleProvider({ children }) {
+export const RoleProvider = ({ children }) => {
   const [role, setRole] = useState('');
 
   return (
@@ -10,10 +13,13 @@ export function RoleProvider({ children }) {
       {children}
     </RoleContext.Provider>
   );
-}
+};
 
-export function useRole() {
-  return useContext(RoleContext);
-}
-
+export const useRole = () => {
+  const context = useContext(RoleContext);
+  if (!context) {
+    throw new Error('useRole must be used within a RoleProvider');
+  }
+  return context;
+};
 export default RoleContext;

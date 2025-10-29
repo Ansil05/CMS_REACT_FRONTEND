@@ -27,6 +27,9 @@ import {
 const PublicLandingPage = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
